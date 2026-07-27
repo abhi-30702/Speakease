@@ -5,7 +5,7 @@ using Whisper.net.Ggml;
 
 namespace WhisperFlowLocal.Services;
 
-public class TranscriptionService : IDisposable
+public class TranscriptionService : IAsyncDisposable
 {
     private WhisperFactory? _factory;
     private WhisperProcessor? _processor;
@@ -50,9 +50,9 @@ public class TranscriptionService : IDisposable
         return sb.ToString().Trim();
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        _processor?.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        if (_processor is not null) await _processor.DisposeAsync();
         _factory?.Dispose();
     }
 }
