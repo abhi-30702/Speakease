@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace WhisperFlowLocal.Interop;
 
-internal static class NativeMethods
+public static class NativeMethods
 {
     // Hotkey modifiers
     public const uint MOD_CONTROL = 0x0002;
