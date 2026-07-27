@@ -28,3 +28,6 @@ TestResult.xml
 project.lock.json
 project.fragment.lock.json
 artifacts/
+
+# Whisper model (large binary, not committed)
+Resources/Models/
