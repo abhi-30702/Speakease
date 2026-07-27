@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Forms;
 
@@ -17,7 +18,7 @@ public partial class App : System.Windows.Application
             var stream = GetResourceStream(new Uri("Resources/tray-icon.ico", UriKind.Relative))?.Stream;
             if (stream != null) icon = new System.Drawing.Icon(stream);
         }
-        catch { }
+        catch (Exception ex) { Debug.WriteLine($"Failed to load tray icon: {ex.Message}"); }
 
         _trayIcon = new NotifyIcon
         {
