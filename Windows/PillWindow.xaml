@@ -1,0 +1,110 @@
+<Window x:Class="WhisperFlowLocal.Windows.PillWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:models="clr-namespace:WhisperFlowLocal.Models"
+        xmlns:conv="clr-namespace:WhisperFlowLocal.Converters"
+        Title="" Width="190" Height="44"
+        AllowsTransparency="True" Background="Transparent"
+        WindowStyle="None" Topmost="True"
+        ShowInTaskbar="False" ShowActivated="False"
+        Focusable="False" IsHitTestVisible="False"
+        ResizeMode="NoResize">
+
+  <Window.Resources>
+    <conv:StateToVisibilityConverter x:Key="RecordingVis" TargetState="Recording"/>
+    <conv:StateToVisibilityConverter x:Key="TranscribingVis" TargetState="Transcribing"/>
+    <conv:StateToVisibilityConverter x:Key="ErrorVis" TargetState="Error"/>
+
+    <!-- Waveform bar animation -->
+    <Storyboard x:Key="WaveAnim" RepeatBehavior="Forever">
+      <DoubleAnimation Storyboard.TargetName="Bar1" Storyboard.TargetProperty="Height"
+                       From="4" To="20" Duration="0:0:0.4" AutoReverse="True"/>
+      <DoubleAnimation Storyboard.TargetName="Bar2" Storyboard.TargetProperty="Height"
+                       From="8" To="24" Duration="0:0:0.5" AutoReverse="True" BeginTime="0:0:0.05"/>
+      <DoubleAnimation Storyboard.TargetName="Bar3" Storyboard.TargetProperty="Height"
+                       From="4" To="18" Duration="0:0:0.35" AutoReverse="True" BeginTime="0:0:0.1"/>
+      <DoubleAnimation Storyboard.TargetName="Bar4" Storyboard.TargetProperty="Height"
+                       From="10" To="22" Duration="0:0:0.45" AutoReverse="True" BeginTime="0:0:0.15"/>
+      <DoubleAnimation Storyboard.TargetName="Bar5" Storyboard.TargetProperty="Height"
+                       From="6" To="20" Duration="0:0:0.4" AutoReverse="True" BeginTime="0:0:0.08"/>
+    </Storyboard>
+  </Window.Resources>
+
+  <Border CornerRadius="22" Background="#E6000010" BorderThickness="1"
+          BorderBrush="#14FFFFFF">
+    <Grid Margin="12,0">
+
+      <!-- RECORDING STATE -->
+      <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                  Visibility="{Binding State, Converter={StaticResource RecordingVis}}">
+        <Ellipse Width="8" Height="8" Fill="#EF4444" Margin="0,0,8,0">
+          <Ellipse.Triggers>
+            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+              <BeginStoryboard>
+                <Storyboard RepeatBehavior="Forever">
+                  <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                   From="1" To="0.2" Duration="0:0:0.8" AutoReverse="True"/>
+                </Storyboard>
+              </BeginStoryboard>
+            </EventTrigger>
+          </Ellipse.Triggers>
+        </Ellipse>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+          <Rectangle x:Name="Bar1" Width="3" Height="4" Fill="#0D9488" Margin="1,0" RadiusX="1" RadiusY="1" VerticalAlignment="Center"/>
+          <Rectangle x:Name="Bar2" Width="3" Height="8" Fill="#0D9488" Margin="1,0" RadiusX="1" RadiusY="1" VerticalAlignment="Center"/>
+          <Rectangle x:Name="Bar3" Width="3" Height="4" Fill="#0D9488" Margin="1,0" RadiusX="1" RadiusY="1" VerticalAlignment="Center"/>
+          <Rectangle x:Name="Bar4" Width="3" Height="10" Fill="#0D9488" Margin="1,0" RadiusX="1" RadiusY="1" VerticalAlignment="Center"/>
+          <Rectangle x:Name="Bar5" Width="3" Height="6" Fill="#0D9488" Margin="1,0" RadiusX="1" RadiusY="1" VerticalAlignment="Center"/>
+        </StackPanel>
+      </StackPanel>
+
+      <!-- TRANSCRIBING STATE -->
+      <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                  Visibility="{Binding State, Converter={StaticResource TranscribingVis}}">
+        <Ellipse Width="8" Height="8" Fill="#0D9488" Margin="0,0,8,0">
+          <Ellipse.Triggers>
+            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+              <BeginStoryboard>
+                <Storyboard RepeatBehavior="Forever">
+                  <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                   From="0.4" To="1" Duration="0:0:0.6" AutoReverse="True"/>
+                </Storyboard>
+              </BeginStoryboard>
+            </EventTrigger>
+          </Ellipse.Triggers>
+        </Ellipse>
+        <Border Height="6" Width="120" CornerRadius="3" Background="#334155" ClipToBounds="True">
+          <Border Height="6" Width="60" CornerRadius="3" Background="#64748B" HorizontalAlignment="Left">
+            <Border.Triggers>
+              <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                <BeginStoryboard>
+                  <Storyboard RepeatBehavior="Forever">
+                    <ThicknessAnimation Storyboard.TargetProperty="Margin"
+                                        From="-60,0,0,0" To="120,0,0,0"
+                                        Duration="0:0:1.2"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </EventTrigger>
+            </Border.Triggers>
+          </Border>
+        </Border>
+      </StackPanel>
+
+      <!-- ERROR STATE -->
+      <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                  Visibility="{Binding State, Converter={StaticResource ErrorVis}}">
+        <TextBlock Text="&#x26A0;" Foreground="#EF4444" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
+        <TextBlock Text="{Binding ErrorMessage}" Foreground="#FCA5A5" FontSize="11"
+                   FontFamily="Consolas" VerticalAlignment="Center"
+                   TextTrimming="CharacterEllipsis" MaxWidth="130"/>
+      </StackPanel>
+
+    </Grid>
+  </Border>
+
+  <Window.Triggers>
+    <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+      <BeginStoryboard x:Name="WaveAnimStoryboard" Storyboard="{StaticResource WaveAnim}"/>
+    </EventTrigger>
+  </Window.Triggers>
+</Window>
