@@ -1,0 +1,14 @@
+<Window x:Class="WhisperFlowLocal.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Whisper Flow Local" Width="800" Height="500"
+        Background="#0F172A">
+  <Grid>
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+      <TextBlock Text="Whisper Flow Local" FontSize="24" Foreground="#F1F5F9"
+                 FontWeight="SemiBold" HorizontalAlignment="Center"/>
+      <TextBlock Text="Settings — M3" FontSize="14" Foreground="#475569"
+                 HorizontalAlignment="Center" Margin="0,8,0,0"/>
+    </StackPanel>
+  </Grid>
+</Window>
