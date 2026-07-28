@@ -60,8 +60,16 @@ public partial class App : System.Windows.Application
         };
 
         var menu = new ContextMenuStrip();
+
+        var toggleItem = new ToolStripMenuItem("Toggle Mode") { CheckOnClick = true };
+        toggleItem.CheckedChanged += (_, _) =>
+        {
+            if (_engine != null) _engine.ToggleMode = toggleItem.Checked;
+        };
+        menu.Items.Add(toggleItem);
         menu.Items.Add("Settings", null, (_, _) => ShowMainWindow());
         menu.Items.Add("Quit", null, (_, _) => Shutdown());
+
         _trayIcon.ContextMenuStrip = menu;
         _trayIcon.DoubleClick += (_, _) => ShowMainWindow();
     }
