@@ -18,6 +18,8 @@ public class TranscriptionService : IAsyncDisposable
 
     public async Task InitializeAsync(IProgress<string>? progress = null)
     {
+        if (_processor is not null) return;
+
         if (!File.Exists(_modelPath))
         {
             progress?.Report("Downloading small.en model (~465 MB)...");
@@ -33,9 +35,19 @@ public class TranscriptionService : IAsyncDisposable
     private static async Task DownloadModelAsync(string destPath)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(destPath)!);
-        using var modelStream = await WhisperGgmlDownloader.GetGgmlModelAsync(GgmlType.SmallEn);
-        await using var fs = File.Create(destPath);
-        await modelStream.CopyToAsync(fs);
+        var tmpPath = destPath + ".tmp";
+        try
+        {
+            using var modelStream = await WhisperGgmlDownloader.GetGgmlModelAsync(GgmlType.SmallEn);
+            await using var fs = File.Create(tmpPath);
+            await modelStream.CopyToAsync(fs);
+            File.Move(tmpPath, destPath, overwrite: true);
+        }
+        catch
+        {
+            if (File.Exists(tmpPath)) File.Delete(tmpPath);
+            throw;
+        }
     }
 
     public async Task<string> TranscribeAsync(MemoryStream pcmStream)
@@ -52,7 +64,7 @@ public class TranscriptionService : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        if (_processor is not null) await _processor.DisposeAsync();
-        _factory?.Dispose();
+        if (_processor is not null) { await _processor.DisposeAsync(); _processor = null; }
+        _factory?.Dispose(); _factory = null;
     }
 }
