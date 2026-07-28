@@ -1,6 +1,7 @@
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Interop;
 using WhisperFlowLocal.Interop;
 using WhisperFlowLocal.Models;
 using WhisperFlowLocal.Services;
@@ -11,13 +12,12 @@ namespace WhisperFlowLocal;
 
 public partial class App : System.Windows.Application
 {
-    private const int HOTKEY_ID = 9001;
-
     private NotifyIcon? _trayIcon;
-    private HwndSource? _hwndSource;
+    private IntPtr _hookHandle = IntPtr.Zero;
+    private NativeMethods.LowLevelKeyboardProc? _hookProc;
     private DictationEngine? _engine;
     private PillWindow? _pillWindow;
-    private WhisperFlowLocal.Windows.MainWindow? _mainWindow;
+    private Windows.MainWindow? _mainWindow;
 
     protected override async void OnStartup(StartupEventArgs e)
     {
@@ -43,8 +43,8 @@ public partial class App : System.Windows.Application
         pillVm.SyncFrom(_engine);
         _pillWindow = new PillWindow(pillVm);
 
-        // Global hotkey via hidden window
-        RegisterHotkey();
+        // Low-level keyboard hook for Ctrl+Space
+        InstallHook();
     }
 
     private void SetupTray()
@@ -68,42 +68,50 @@ public partial class App : System.Windows.Application
 
     private void ShowMainWindow()
     {
-        _mainWindow ??= new WhisperFlowLocal.Windows.MainWindow();
+        _mainWindow ??= new Windows.MainWindow();
         _mainWindow.Show();
         _mainWindow.Activate();
     }
 
-    private void RegisterHotkey()
+    private void InstallHook()
     {
-        // Hidden helper window to receive WM_HOTKEY messages
-        var helper = new Window { Width = 0, Height = 0, WindowStyle = WindowStyle.None, ShowInTaskbar = false };
-        helper.Show();
-        helper.Hide();
-
-        var handle = new WindowInteropHelper(helper).EnsureHandle();
-        _hwndSource = HwndSource.FromHwnd(handle);
-        _hwndSource.AddHook(WndProc);
-
-        NativeMethods.RegisterHotKey(handle, HOTKEY_ID, NativeMethods.MOD_CONTROL, NativeMethods.VK_SPACE);
+        _hookProc = LowLevelKeyboardHook;
+        using var curProcess = Process.GetCurrentProcess();
+        using var curModule = curProcess.MainModule!;
+        _hookHandle = NativeMethods.SetWindowsHookEx(
+            NativeMethods.WH_KEYBOARD_LL,
+            _hookProc,
+            NativeMethods.GetModuleHandle(curModule.ModuleName),
+            0);
     }
 
-    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    private IntPtr LowLevelKeyboardHook(int nCode, IntPtr wParam, IntPtr lParam)
     {
-        if (msg == NativeMethods.WM_HOTKEY && wParam.ToInt32() == HOTKEY_ID)
+        if (nCode >= 0)
         {
-            // lParam bit 31: 0 = key down, 1 = key up
-            bool isKeyUp = ((lParam.ToInt64() >> 31) & 1) == 1;
-            if (!isKeyUp) _engine?.OnHotkeyPressed();
-            else          _engine?.OnHotkeyReleased();
-            handled = true;
+            var kb = Marshal.PtrToStructure<NativeMethods.KBDLLHOOKSTRUCT>(lParam);
+            bool isSpace = kb.vkCode == NativeMethods.VK_SPACE;
+            bool ctrlDown = (NativeMethods.GetAsyncKeyState(NativeMethods.VK_CONTROL) & 0x8000) != 0;
+
+            if (isSpace && ctrlDown)
+            {
+                int msg = wParam.ToInt32();
+                if (msg == NativeMethods.WM_KEYDOWN || msg == NativeMethods.WM_SYSKEYDOWN)
+                    Dispatcher.BeginInvoke(() => _engine?.OnHotkeyPressed());
+                else if (msg == NativeMethods.WM_KEYUP || msg == NativeMethods.WM_SYSKEYUP)
+                    Dispatcher.BeginInvoke(() => _engine?.OnHotkeyReleased());
+            }
         }
-        return IntPtr.Zero;
+        return NativeMethods.CallNextHookEx(_hookHandle, nCode, wParam, lParam);
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
-        if (_hwndSource != null)
-            NativeMethods.UnregisterHotKey(_hwndSource.Handle, HOTKEY_ID);
+        if (_hookHandle != IntPtr.Zero)
+        {
+            NativeMethods.UnhookWindowsHookEx(_hookHandle);
+            _hookHandle = IntPtr.Zero;
+        }
         _trayIcon?.Dispose();
         base.OnExit(e);
     }
