@@ -28,7 +28,7 @@ public partial class App : System.Windows.Application
         var audio = new AudioCaptureService();
         var modelPath = System.IO.Path.Combine(AppContext.BaseDirectory, "Resources", "Models", "ggml-small.en.bin");
         var transcription = new TranscriptionService(modelPath);
-        var cleanup = new CleanupService();
+        var cleanup = new RegexCleanupService();
         var insertion = new InsertionService(focus);
 
         // Tray + loading balloon

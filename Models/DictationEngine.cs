@@ -7,7 +7,7 @@ public partial class DictationEngine : ObservableObject
 {
     private readonly AudioCaptureService _audio;
     private readonly TranscriptionService _transcription;
-    private readonly CleanupService _cleanup;
+    private readonly ICleanupService _cleanup;
     private readonly InsertionService _insertion;
     private readonly FocusService _focus;
 
@@ -18,7 +18,7 @@ public partial class DictationEngine : ObservableObject
     public DictationEngine(
         AudioCaptureService audio,
         TranscriptionService transcription,
-        CleanupService cleanup,
+        ICleanupService cleanup,
         InsertionService insertion,
         FocusService focus)
     {
@@ -59,10 +59,10 @@ public partial class DictationEngine : ObservableObject
         {
             var pcm = _audio.Stop();
             var raw = await _transcription.TranscribeAsync(pcm);
-            var cleaned = _cleanup.Clean(raw);
+            var cleanupResult = await _cleanup.CleanAsync(raw);
 
             State = RecordingState.Inserting;
-            bool ok = _insertion.Insert(cleaned);
+            bool ok = _insertion.Insert(cleanupResult.Text);
             if (!ok) throw new InvalidOperationException("SendInput returned 0 — insertion blocked by target app");
 
             State = RecordingState.Idle;

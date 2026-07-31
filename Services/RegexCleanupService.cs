@@ -1,8 +1,9 @@
 using System.Text.RegularExpressions;
+using WhisperFlowLocal.Models;
 
 namespace WhisperFlowLocal.Services;
 
-public class CleanupService
+public class RegexCleanupService : ICleanupService
 {
     private static readonly string[] CorrectionMarkers =
         ["no wait", "actually no", "i mean", "scratch that",
@@ -12,14 +13,15 @@ public class CleanupService
         ["you know", "sort of", "kind of", "um", "uh", "er",
          "basically", "literally"];
 
-    public string Clean(string text)
+    public Task<CleanupResult> CleanAsync(string rawText, string? appContext = null)
     {
-        text = RemoveSelfCorrections(text);
-        text = RemoveFillers(text);
-        text = FixCapsAndPunct(text);
-        text = NormaliseWhitespace(text);
-        return text;
+        var raw = rawText;
+        var cleaned = NormaliseWhitespace(FixCapsAndPunct(RemoveFillers(RemoveSelfCorrections(rawText))));
+        int fixes = Math.Abs(CountWords(raw) - CountWords(cleaned));
+        return Task.FromResult(new CleanupResult(cleaned, fixes, "regex"));
     }
+
+    private static int CountWords(string s) => s.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
 
     private static string RemoveSelfCorrections(string text)
     {
@@ -32,8 +34,7 @@ public class CleanupService
             if (idx > latestCut) { latestCut = idx; marker = m; }
         }
         if (latestCut < 0 || marker is null) return text;
-        var after = text[(latestCut + marker.Length)..].TrimStart();
-        return after;
+        return text[(latestCut + marker.Length)..].TrimStart();
     }
 
     private static string RemoveFillers(string text)
