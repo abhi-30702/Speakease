@@ -18,6 +18,7 @@ public partial class App : System.Windows.Application
     private DictationEngine? _engine;
     private PillWindow? _pillWindow;
     private Windows.MainWindow? _mainWindow;
+    private InsightsRepository? _insights;
 
     protected override async void OnStartup(StartupEventArgs e)
     {
@@ -25,6 +26,12 @@ public partial class App : System.Windows.Application
 
         var settingsService = new SettingsService();
         settingsService.Load();
+
+        var dbPath = System.IO.Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "WhisperFlowLocal", "insights.db");
+        _insights = new InsightsRepository(dbPath);
+        await _insights.InitAsync();
 
         var focus = new FocusService();
         var audio = new AudioCaptureService();
@@ -41,7 +48,7 @@ public partial class App : System.Windows.Application
         _trayIcon.ShowBalloonTip(2000, "Whisper Flow", "Ready. Hold Ctrl+Space to dictate.", ToolTipIcon.Info);
 
         // Engine + pill
-        _engine = new DictationEngine(audio, transcription, cleanup, insertion, focus);
+        _engine = new DictationEngine(audio, transcription, cleanup, insertion, focus, _insights!);
         var pillVm = new PillViewModel();
         pillVm.SyncFrom(_engine);
         _pillWindow = new PillWindow(pillVm);
@@ -123,6 +130,7 @@ public partial class App : System.Windows.Application
             NativeMethods.UnhookWindowsHookEx(_hookHandle);
             _hookHandle = IntPtr.Zero;
         }
+        _insights?.Dispose();
         _trayIcon?.Dispose();
         base.OnExit(e);
     }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using WhisperFlowLocal.Services;
 
@@ -10,20 +11,28 @@ public partial class DictationEngine : ObservableObject
     private readonly ICleanupService _cleanup;
     private readonly InsertionService _insertion;
     private readonly FocusService _focus;
+    private readonly InsightsRepository _insights;
+    private readonly Stopwatch _recordingTimer = new();
+    private string _currentAppName = string.Empty;
+    private string _currentAppTitle = string.Empty;
 
     [ObservableProperty] private RecordingState _state = RecordingState.Idle;
     [ObservableProperty] private string _errorMessage = string.Empty;
     [ObservableProperty] private bool _toggleMode = false;
+
+    public event Action? DictationCompleted;
 
     public DictationEngine(
         AudioCaptureService audio,
         TranscriptionService transcription,
         ICleanupService cleanup,
         InsertionService insertion,
-        FocusService focus)
+        FocusService focus,
+        InsightsRepository insights)
     {
         _audio = audio; _transcription = transcription;
-        _cleanup = cleanup; _insertion = insertion; _focus = focus;
+        _cleanup = cleanup; _insertion = insertion;
+        _focus = focus; _insights = insights;
     }
 
     public void OnHotkeyPressed()
@@ -48,6 +57,9 @@ public partial class DictationEngine : ObservableObject
     private void StartRecording()
     {
         _focus.CaptureForegroudWindow();
+        _currentAppName = _focus.GetForegroundAppName();
+        _currentAppTitle = _focus.GetForegroundWindowTitle();
+        _recordingTimer.Restart();
         _audio.Start();
         State = RecordingState.Recording;
     }
@@ -58,14 +70,30 @@ public partial class DictationEngine : ObservableObject
         try
         {
             var pcm = _audio.Stop();
+            var durationMs = (int)_recordingTimer.ElapsedMilliseconds;
             var transcriptionResult = await _transcription.TranscribeAsync(pcm);
-            var cleanupResult = await _cleanup.CleanAsync(transcriptionResult.Text);
+            var cleanupResult = await _cleanup.CleanAsync(transcriptionResult.Text, _currentAppName);
 
             State = RecordingState.Inserting;
             bool ok = _insertion.Insert(cleanupResult.Text);
-            if (!ok) throw new InvalidOperationException("SendInput returned 0 — insertion blocked by target app");
+            if (!ok)
+                throw new InvalidOperationException("SendInput returned 0 — insertion blocked by target app");
 
             State = RecordingState.Idle;
+
+            try
+            {
+                var wordCount = CountWords(cleanupResult.Text);
+                var wpm = durationMs > 0 ? wordCount / (durationMs / 60000.0) : 0;
+                await _insights.RecordAsync(new DictationRecord(
+                    DateTime.UtcNow, _currentAppName, _currentAppTitle,
+                    durationMs, wordCount, wpm,
+                    transcriptionResult.Text, cleanupResult.Text,
+                    cleanupResult.Tier, cleanupResult.FixesCount,
+                    true, transcriptionResult.AvgConfidence));
+                DictationCompleted?.Invoke();
+            }
+            catch { /* logging failure must never surface to user */ }
         }
         catch (Exception ex)
         {
@@ -75,4 +103,7 @@ public partial class DictationEngine : ObservableObject
             State = RecordingState.Idle;
         }
     }
+
+    private static int CountWords(string s) =>
+        s.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
 }
