@@ -2,6 +2,7 @@ using System.IO;
 using System.Text;
 using Whisper.net;
 using Whisper.net.Ggml;
+using WhisperFlowLocal.Models;
 
 namespace WhisperFlowLocal.Services;
 
@@ -29,6 +30,7 @@ public class TranscriptionService : IAsyncDisposable
         _factory = WhisperFactory.FromPath(_modelPath);
         _processor = _factory.CreateBuilder()
             .WithLanguage("en")
+            .WithProbabilities()
             .Build();
     }
 
@@ -50,16 +52,23 @@ public class TranscriptionService : IAsyncDisposable
         }
     }
 
-    public async Task<string> TranscribeAsync(MemoryStream pcmStream)
+    public async Task<TranscriptionResult> TranscribeAsync(MemoryStream pcmStream)
     {
         if (_processor is null)
             throw new InvalidOperationException("Call InitializeAsync first.");
 
         var wav = WavHelper.WrapInWav(pcmStream);
         var sb = new StringBuilder();
+        double totalProb = 0;
+        int segCount = 0;
         await foreach (var segment in _processor.ProcessAsync(wav))
+        {
             sb.Append(segment.Text).Append(' ');
-        return sb.ToString().Trim();
+            totalProb += segment.Probability;
+            segCount++;
+        }
+        double avgConf = segCount > 0 ? totalProb / segCount : 0;
+        return new TranscriptionResult(sb.ToString().Trim(), avgConf);
     }
 
     public async ValueTask DisposeAsync()

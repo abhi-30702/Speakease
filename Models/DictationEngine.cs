@@ -58,8 +58,8 @@ public partial class DictationEngine : ObservableObject
         try
         {
             var pcm = _audio.Stop();
-            var raw = await _transcription.TranscribeAsync(pcm);
-            var cleanupResult = await _cleanup.CleanAsync(raw);
+            var transcriptionResult = await _transcription.TranscribeAsync(pcm);
+            var cleanupResult = await _cleanup.CleanAsync(transcriptionResult.Text);
 
             State = RecordingState.Inserting;
             bool ok = _insertion.Insert(cleanupResult.Text);
