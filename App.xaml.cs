@@ -23,15 +23,18 @@ public partial class App : System.Windows.Application
     {
         base.OnStartup(e);
 
-        // Build services
+        var settingsService = new SettingsService();
+        settingsService.Load();
+
         var focus = new FocusService();
         var audio = new AudioCaptureService();
         var modelPath = System.IO.Path.Combine(AppContext.BaseDirectory, "Resources", "Models", "ggml-small.en.bin");
         var transcription = new TranscriptionService(modelPath);
-        var cleanup = new RegexCleanupService();
+        var regex = new RegexCleanupService();
+        var groq = new GroqCleanupService(new System.Net.Http.HttpClient(), settingsService);
+        var cleanup = new TieredCleanupService(groq, regex);
         var insertion = new InsertionService(focus);
 
-        // Tray + loading balloon
         SetupTray();
         _trayIcon!.ShowBalloonTip(3000, "Whisper Flow", "Loading speech model...", ToolTipIcon.Info);
         await transcription.InitializeAsync();
