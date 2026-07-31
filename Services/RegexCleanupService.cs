@@ -13,6 +13,10 @@ public class RegexCleanupService : ICleanupService
         ["you know", "sort of", "kind of", "um", "uh", "er",
          "basically", "literally"];
 
+    private static readonly Regex FillerRegex = new(
+        $@"\b({string.Join('|', Fillers.Select(Regex.Escape))})\b",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
     public Task<CleanupResult> CleanAsync(string rawText, string? appContext = null)
     {
         var raw = rawText;
@@ -34,15 +38,13 @@ public class RegexCleanupService : ICleanupService
             if (idx > latestCut) { latestCut = idx; marker = m; }
         }
         if (latestCut < 0 || marker is null) return text;
-        return text[(latestCut + marker.Length)..].TrimStart();
+        var after = text[(latestCut + marker.Length)..].TrimStart();
+        // if marker was at the end, keep what came before it
+        return after.Length > 0 ? after : text[..latestCut].TrimEnd();
     }
 
     private static string RemoveFillers(string text)
-    {
-        foreach (var filler in Fillers)
-            text = Regex.Replace(text, $@"\b{Regex.Escape(filler)}\b", "", RegexOptions.IgnoreCase);
-        return Regex.Replace(text, @" {2,}", " ").Trim();
-    }
+        => FillerRegex.Replace(text, "").Trim();
 
     private static string FixCapsAndPunct(string text)
     {

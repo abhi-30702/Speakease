@@ -17,5 +17,5 @@ public class RegexCleanupServiceTests
     [Fact] public async Task NoDoubleSpaces() { var r = await _svc.CleanAsync("hello   world"); Assert.DoesNotContain("  ", r.Text); }
     [Fact] public async Task NoSpaceBeforeComma() { var r = await _svc.CleanAsync("yes , I agree"); Assert.DoesNotContain(" ,", r.Text); }
     [Fact] public async Task TierIsRegex() { var r = await _svc.CleanAsync("hello"); Assert.Equal("regex", r.Tier); }
-    [Fact] public async Task FixesCountIsNonNegative() { var r = await _svc.CleanAsync("um uh hello world"); Assert.True(r.FixesCount >= 0); }
+    [Fact] public async Task FixesCountReflectsStrippedWords() { var r = await _svc.CleanAsync("um uh hello world"); Assert.Equal(2, r.FixesCount); }
 }
