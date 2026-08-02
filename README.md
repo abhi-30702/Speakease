@@ -1,4 +1,4 @@
-# Whisper Flow Local
+# Speakease
 
 A Windows desktop dictation app that transcribes speech to text and inserts it into any active window — all locally, with no clipboard. Built with .NET 8 + WPF.
 
