@@ -1,0 +1,113 @@
+<h2>Dynamic Island — dictation pill</h2>
+<p class="subtitle">Floating dark capsule at bottom-centre. Expands on recording, shrinks back when done. Pick a size/style.</p>
+
+<div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;margin-top:8px;">
+
+  <!-- Option A: Compact pill with waveform -->
+  <div style="flex:1;min-width:260px;">
+    <div class="label" style="margin-bottom:10px;">A — Compact pill</div>
+    <div style="background:#d0d0d0;border-radius:12px;height:160px;position:relative;overflow:hidden;">
+      <div style="font-size:10px;color:#999;text-align:center;padding-top:14px;">[ your desktop ]</div>
+      <!-- Dynamic Island pill -->
+      <div style="position:absolute;bottom:18px;left:50%;transform:translateX(-50%);background:#000;border-radius:30px;padding:8px 20px;display:flex;align-items:center;gap:10px;min-width:160px;justify-content:center;box-shadow:0 4px 24px rgba(0,0,0,0.5);">
+        <div style="display:flex;align-items:center;gap:2px;height:16px;">
+          <div style="width:2px;height:5px;background:#E5BDDF;border-radius:1px;"></div>
+          <div style="width:2px;height:11px;background:#E5BDDF;border-radius:1px;"></div>
+          <div style="width:2px;height:7px;background:#E5BDDF;border-radius:1px;"></div>
+          <div style="width:2px;height:13px;background:#E5BDDF;border-radius:1px;"></div>
+          <div style="width:2px;height:6px;background:#E5BDDF;border-radius:1px;"></div>
+          <div style="width:2px;height:10px;background:#E5BDDF;border-radius:1px;"></div>
+          <div style="width:2px;height:4px;background:#E5BDDF;border-radius:1px;"></div>
+          <div style="width:2px;height:9px;background:#E5BDDF;border-radius:1px;"></div>
+          <div style="width:2px;height:12px;background:#E5BDDF;border-radius:1px;"></div>
+          <div style="width:2px;height:6px;background:#E5BDDF;border-radius:1px;"></div>
+        </div>
+        <span style="color:#E5BDDF;font-size:10px;font-weight:500;letter-spacing:0.5px;">Listening…</span>
+      </div>
+    </div>
+    <p style="color:#888;font-size:11px;margin-top:6px;">Tight pill — waveform + label only. Grows slightly on expand.</p>
+  </div>
+
+  <!-- Option B: Wider pill with mic icon + timer -->
+  <div style="flex:1;min-width:260px;">
+    <div class="label" style="margin-bottom:10px;">B — Wider pill with timer</div>
+    <div style="background:#d0d0d0;border-radius:12px;height:160px;position:relative;overflow:hidden;">
+      <div style="font-size:10px;color:#999;text-align:center;padding-top:14px;">[ your desktop ]</div>
+      <div style="position:absolute;bottom:18px;left:50%;transform:translateX(-50%);background:#000;border-radius:30px;padding:10px 24px;display:flex;align-items:center;gap:12px;min-width:220px;justify-content:space-between;box-shadow:0 4px 24px rgba(0,0,0,0.5);">
+        <!-- Mic dot -->
+        <div style="width:8px;height:8px;border-radius:50%;background:#E5BDDF;box-shadow:0 0 6px #E5BDDF;"></div>
+        <!-- Waveform -->
+        <div style="display:flex;align-items:center;gap:2px;height:18px;flex:1;justify-content:center;">
+          <div style="width:2px;height:6px;background:#E5BDDF;border-radius:1px;opacity:0.6;"></div>
+          <div style="width:2px;height:13px;background:#E5BDDF;border-radius:1px;"></div>
+          <div style="width:2px;height:8px;background:#E5BDDF;border-radius:1px;opacity:0.8;"></div>
+          <div style="width:2px;height:15px;background:#E5BDDF;border-radius:1px;"></div>
+          <div style="width:2px;height:5px;background:#E5BDDF;border-radius:1px;opacity:0.5;"></div>
+          <div style="width:2px;height:11px;background:#E5BDDF;border-radius:1px;opacity:0.9;"></div>
+          <div style="width:2px;height:7px;background:#E5BDDF;border-radius:1px;opacity:0.7;"></div>
+          <div style="width:2px;height:14px;background:#E5BDDF;border-radius:1px;"></div>
+          <div style="width:2px;height:4px;background:#E5BDDF;border-radius:1px;opacity:0.4;"></div>
+          <div style="width:2px;height:10px;background:#E5BDDF;border-radius:1px;opacity:0.8;"></div>
+          <div style="width:2px;height:12px;background:#E5BDDF;border-radius:1px;"></div>
+          <div style="width:2px;height:6px;background:#E5BDDF;border-radius:1px;opacity:0.6;"></div>
+        </div>
+        <!-- Timer -->
+        <span style="color:#888;font-size:10px;font-family:monospace;">0:03</span>
+      </div>
+    </div>
+    <p style="color:#888;font-size:11px;margin-top:6px;">Pink glow dot + waveform + recording timer. More info at a glance.</p>
+  </div>
+
+  <!-- Option C: States — idle dot → recording pill → processing -->
+  <div style="flex:1;min-width:260px;">
+    <div class="label" style="margin-bottom:10px;">C — Multi-state pill</div>
+    <div style="background:#d0d0d0;border-radius:12px;height:160px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:14px;">
+      <!-- Idle (tiny dot) -->
+      <div style="display:flex;justify-content:center;margin-bottom:8px;flex-direction:column;align-items:center;gap:4px;">
+        <span style="font-size:8px;color:#999;">IDLE</span>
+        <div style="background:#000;border-radius:50%;width:10px;height:10px;"></div>
+      </div>
+      <!-- Recording -->
+      <div style="display:flex;justify-content:center;margin-bottom:8px;flex-direction:column;align-items:center;gap:4px;">
+        <span style="font-size:8px;color:#999;">RECORDING</span>
+        <div style="background:#000;border-radius:30px;padding:7px 18px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
+          <div style="display:flex;align-items:center;gap:2px;height:14px;">
+            <div style="width:2px;height:9px;background:#E5BDDF;border-radius:1px;"></div>
+            <div style="width:2px;height:13px;background:#E5BDDF;border-radius:1px;"></div>
+            <div style="width:2px;height:6px;background:#E5BDDF;border-radius:1px;"></div>
+            <div style="width:2px;height:11px;background:#E5BDDF;border-radius:1px;"></div>
+            <div style="width:2px;height:8px;background:#E5BDDF;border-radius:1px;"></div>
+          </div>
+          <span style="color:#E5BDDF;font-size:9px;">Listening</span>
+        </div>
+      </div>
+      <!-- Processing -->
+      <div style="display:flex;justify-content:center;flex-direction:column;align-items:center;gap:4px;">
+        <span style="font-size:8px;color:#999;">PROCESSING</span>
+        <div style="background:#000;border-radius:30px;padding:7px 18px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
+          <div style="width:6px;height:6px;border-radius:50%;border:1.5px solid #E5BDDF;border-top-color:transparent;"></div>
+          <span style="color:#888;font-size:9px;">Transcribing…</span>
+        </div>
+      </div>
+    </div>
+    <p style="color:#888;font-size:11px;margin-top:6px;">Tiny dot when idle → expands to pill on record → shrinks to spinner on process.</p>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:20px;">Click one, or describe what you want changed in the terminal.</p>
+
+<div class="options" style="margin-top:12px;">
+  <div class="option" data-choice="A" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content"><h3>Compact pill</h3><p>Waveform + label</p></div>
+  </div>
+  <div class="option" data-choice="B" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content"><h3>Wider pill + timer</h3><p>Mic dot, waveform, timer</p></div>
+  </div>
+  <div class="option" data-choice="C" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content"><h3>Multi-state pill</h3><p>Dot → pill → spinner</p></div>
+  </div>
+</div>

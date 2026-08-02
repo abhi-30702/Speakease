@@ -1,14 +1,15 @@
-; WhisperFlow.iss — Inno Setup 6 script
-; Version is injected at build time via: iscc /DMyAppVersion=1.0.0 WhisperFlow.iss
+; Speakease.iss — Inno Setup 6 script
+; Version is injected at build time via: iscc /DMyAppVersion=1.0.0 Speakease.iss
 
 #ifndef MyAppVersion
   #define MyAppVersion "0.0.0"
 #endif
 
-#define MyAppName      "Whisper Flow"
-#define MyAppExeName   "WhisperFlowLocal.exe"
+#define MyAppName      "Speakease"
+#define MyAppExeName   "Speakease.exe"
 #define MyAppPublisher "Abhishek K"
 #define MyAppURL       "https://github.com/abhi-30702/Speakease"
+
 [Setup]
 AppId={{B8F4C2A1-9D3E-4F7B-A5C6-8E2D1F0B9A3C}
 AppName={#MyAppName}
@@ -16,11 +17,11 @@ AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}/releases
-DefaultDirName={localappdata}\Programs\WhisperFlowLocal
+DefaultDirName={localappdata}\Programs\Speakease
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 OutputDir={#SourcePath}\output
-OutputBaseFilename=WhisperFlowSetup
+OutputBaseFilename=SpeakeaseSetup
 SetupIconFile=..\Resources\tray-icon.ico
 Compression=lzma2/ultra64
 SolidCompression=yes

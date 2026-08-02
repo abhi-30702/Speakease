@@ -5,7 +5,7 @@ namespace WhisperFlowLocal.Services;
 public static class StartupService
 {
     private const string RunKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
-    private const string AppName = "WhisperFlow";
+    private const string AppName = "Speakease";
 
     public static bool IsEnabled()
     {

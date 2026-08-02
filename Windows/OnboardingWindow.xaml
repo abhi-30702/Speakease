@@ -1,7 +1,7 @@
 <Window x:Class="WhisperFlowLocal.Windows.OnboardingWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Whisper Flow — Setup"
+        Title="Speakease — Setup"
         Width="560" Height="420"
         Background="#1D1D1D"
         WindowStyle="None"
@@ -30,7 +30,7 @@
             <StackPanel x:Name="Step1Panel"
                         VerticalAlignment="Center" HorizontalAlignment="Center">
                 <TextBlock Text="&#127897;" FontSize="52" HorizontalAlignment="Center" Margin="0,0,0,16"/>
-                <TextBlock Text="Welcome to Whisper Flow"
+                <TextBlock Text="Welcome to Speakease"
                            Foreground="#F0F0F0" FontSize="22" FontWeight="Bold"
                            HorizontalAlignment="Center" Margin="0,0,0,10"/>
                 <TextBlock Text="Dictate into any app. Text appears at your cursor — no clipboard, no cloud."

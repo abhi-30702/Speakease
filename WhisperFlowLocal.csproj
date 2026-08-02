@@ -9,6 +9,9 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Version>1.0.0</Version>
+    <AssemblyName>Speakease</AssemblyName>
+    <AssemblyTitle>Speakease</AssemblyTitle>
+    <Product>Speakease</Product>
   </PropertyGroup>
 
   <ItemGroup>

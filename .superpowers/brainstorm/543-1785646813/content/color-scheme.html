@@ -1,0 +1,98 @@
+<h2>New color scheme — full UI preview</h2>
+<p class="subtitle">#1D1D1D background · #E5BDDF accent · black dictation bar. Let me know what to adjust.</p>
+
+<div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
+
+  <!-- Main window -->
+  <div style="flex:1;min-width:320px;">
+    <div class="label" style="margin-bottom:8px;">Main window (Insights)</div>
+    <div style="background:#1D1D1D;border-radius:10px;overflow:hidden;font-family:sans-serif;border:1px solid #2a2a2a;">
+      <div style="display:flex;height:300px;">
+        <!-- Sidebar -->
+        <div style="width:130px;background:#141414;border-right:1px solid #2a2a2a;padding:16px 10px;display:flex;flex-direction:column;gap:4px;">
+          <div style="color:#E5BDDF;font-size:12px;font-weight:bold;margin-bottom:14px;padding-left:6px;">Whisper Flow</div>
+          <div style="background:#2a2a2a;color:#E5BDDF;padding:7px 10px;border-radius:5px;font-size:11px;">● Insights</div>
+          <div style="color:#888;padding:7px 10px;font-size:11px;">○ Settings</div>
+        </div>
+        <!-- Content -->
+        <div style="flex:1;padding:16px;overflow:hidden;">
+          <div style="color:#F0F0F0;font-size:14px;font-weight:bold;margin-bottom:12px;">Insights</div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;">
+            <div style="flex:1;background:#242424;border-radius:6px;padding:10px;">
+              <div style="color:#888;font-size:9px;margin-bottom:4px;">TOTAL WORDS</div>
+              <div style="color:#F0F0F0;font-size:18px;font-weight:bold;">0</div>
+            </div>
+            <div style="flex:1;background:#242424;border-radius:6px;padding:10px;">
+              <div style="color:#888;font-size:9px;margin-bottom:4px;">TODAY WPM</div>
+              <div style="color:#F0F0F0;font-size:18px;font-weight:bold;">—</div>
+            </div>
+            <div style="flex:1;background:#242424;border-radius:6px;padding:10px;">
+              <div style="color:#888;font-size:9px;margin-bottom:4px;">AI FIXES</div>
+              <div style="color:#F0F0F0;font-size:18px;font-weight:bold;">0</div>
+            </div>
+          </div>
+          <div style="background:#242424;border-radius:6px;padding:10px;">
+            <div style="color:#888;font-size:9px;margin-bottom:8px;">APP BREAKDOWN</div>
+            <div style="color:#666;font-size:10px;text-align:center;padding:12px;">No dictations yet</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div style="flex:1;min-width:240px;">
+    <div class="label" style="margin-bottom:8px;">Settings view</div>
+    <div style="background:#1D1D1D;border-radius:10px;overflow:hidden;font-family:sans-serif;border:1px solid #2a2a2a;padding:16px;">
+      <div style="color:#F0F0F0;font-size:13px;font-weight:bold;margin-bottom:14px;">Settings</div>
+      <div style="background:#242424;border-radius:6px;padding:12px;">
+        <div style="color:#E5BDDF;font-size:11px;font-weight:bold;margin-bottom:10px;">Groq API</div>
+        <div style="color:#888;font-size:9px;margin-bottom:4px;">API KEY</div>
+        <div style="background:#1D1D1D;border:1px solid #333;border-radius:4px;padding:6px 8px;color:#555;font-size:10px;margin-bottom:10px;">••••••••••••</div>
+        <div style="background:#E5BDDF;color:#1D1D1D;padding:5px 12px;border-radius:4px;font-size:10px;font-weight:bold;display:inline-block;">Save</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Onboarding preview -->
+<div style="margin-top:20px;">
+  <div class="label" style="margin-bottom:8px;">Onboarding window</div>
+  <div style="background:#1D1D1D;border-radius:10px;font-family:sans-serif;border:1px solid #2a2a2a;padding:28px;max-width:400px;">
+    <div style="color:#E5BDDF;font-size:10px;font-weight:bold;letter-spacing:1.5px;margin-bottom:10px;">STEP 1 OF 4</div>
+    <div style="color:#F0F0F0;font-size:18px;font-weight:bold;margin-bottom:8px;">Welcome to Whisper Flow</div>
+    <div style="color:#888;font-size:12px;line-height:1.6;margin-bottom:20px;">Hold Ctrl+Space anywhere to dictate. Text appears at your cursor — no clipboard, no cloud.</div>
+    <div style="background:#2a2a2a;border-radius:3px;height:3px;margin-bottom:18px;">
+      <div style="background:#E5BDDF;border-radius:3px;height:3px;width:25%;"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;">
+      <div style="background:#E5BDDF;color:#1D1D1D;padding:7px 18px;border-radius:4px;font-size:12px;font-weight:bold;">Continue →</div>
+    </div>
+  </div>
+</div>
+
+<!-- Dictation bar -->
+<div style="margin-top:20px;">
+  <div class="label" style="margin-bottom:8px;">Dictation bar — bottom of screen (recording state)</div>
+  <div style="position:relative;background:#E8E8E8;border-radius:8px;height:60px;overflow:hidden;">
+    <div style="font-size:10px;color:#999;text-align:center;padding-top:10px;">[ your desktop ]</div>
+    <!-- Black bar at bottom -->
+    <div style="position:absolute;bottom:0;left:0;right:0;background:#000;height:22px;display:flex;align-items:center;justify-content:center;gap:3px;">
+      <!-- Waveform bars animation (static preview) -->
+      <div style="width:2px;height:6px;background:#E5BDDF;border-radius:1px;"></div>
+      <div style="width:2px;height:12px;background:#E5BDDF;border-radius:1px;"></div>
+      <div style="width:2px;height:8px;background:#E5BDDF;border-radius:1px;"></div>
+      <div style="width:2px;height:14px;background:#E5BDDF;border-radius:1px;"></div>
+      <div style="width:2px;height:5px;background:#E5BDDF;border-radius:1px;"></div>
+      <div style="width:2px;height:10px;background:#E5BDDF;border-radius:1px;"></div>
+      <div style="width:2px;height:7px;background:#E5BDDF;border-radius:1px;"></div>
+      <div style="width:2px;height:13px;background:#E5BDDF;border-radius:1px;"></div>
+      <div style="width:2px;height:4px;background:#E5BDDF;border-radius:1px;"></div>
+      <div style="width:2px;height:9px;background:#E5BDDF;border-radius:1px;"></div>
+      <div style="width:6px;"></div>
+      <div style="color:#E5BDDF;font-size:8px;letter-spacing:0.5px;">RECORDING</div>
+    </div>
+  </div>
+  <p style="color:#666;font-size:11px;margin-top:6px;">Full-width black bar, hugs the bottom taskbar edge. Pink waveform + label. Invisible when idle.</p>
+</div>

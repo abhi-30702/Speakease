@@ -11,7 +11,7 @@ public static class UpdateChecker
 
     static UpdateChecker()
     {
-        _http.DefaultRequestHeaders.UserAgent.ParseAdd("WhisperFlowLocal/1.0");
+        _http.DefaultRequestHeaders.UserAgent.ParseAdd("Speakease/1.0");
     }
 
     /// <summary>Returns (true, "v1.2.3") when a newer release exists, else (false, "").</summary>

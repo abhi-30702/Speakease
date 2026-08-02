@@ -8,7 +8,7 @@ public class SettingsService
 {
     private static readonly string DefaultPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "WhisperFlowLocal", "settings.json");
+        "Speakease", "settings.json");
 
     private readonly string _path;
     public AppSettings Current { get; private set; } = new();

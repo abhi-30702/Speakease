@@ -35,7 +35,7 @@ public partial class App : System.Windows.Application
         // Insights DB
         var dbPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "WhisperFlowLocal", "insights.db");
+            "Speakease", "insights.db");
         _insights = new InsightsRepository(dbPath);
         await _insights.InitAsync();
 
@@ -64,9 +64,9 @@ public partial class App : System.Windows.Application
 
         // Tray + model load (InitializeAsync is a no-op when model is already loaded from onboarding)
         SetupTray();
-        _trayIcon!.ShowBalloonTip(3000, "Whisper Flow", "Loading speech model...", ToolTipIcon.Info);
+        _trayIcon!.ShowBalloonTip(3000, "Speakease", "Loading speech model...", ToolTipIcon.Info);
         await transcription.InitializeAsync();
-        _trayIcon.ShowBalloonTip(2000, "Whisper Flow", "Ready. Hold Ctrl+Space to dictate.", ToolTipIcon.Info);
+        _trayIcon.ShowBalloonTip(2000, "Speakease", "Ready. Hold Ctrl+Space to dictate.", ToolTipIcon.Info);
 
         // Engine
         _engine = new DictationEngine(audio, transcription, cleanup, insertion, focus, _insights);
@@ -123,7 +123,7 @@ public partial class App : System.Windows.Application
         {
             Icon    = iconStream != null ? new System.Drawing.Icon(iconStream) : SystemIcons.Application,
             Visible = true,
-            Text    = "Whisper Flow Local"
+            Text    = "Speakease"
         };
 
         var menu       = new ContextMenuStrip();
