@@ -1,5 +1,5 @@
 ; WhisperFlow.iss — Inno Setup 6 script
-; Version is injected at build time via: iscc /DMyAppVersion=0.1.0 WhisperFlow.iss
+; Version is injected at build time via: iscc /DMyAppVersion=1.0.0 WhisperFlow.iss
 
 #ifndef MyAppVersion
   #define MyAppVersion "0.0.0"
