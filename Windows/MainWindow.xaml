@@ -6,7 +6,7 @@
         Title="Whisper Flow Local"
         Width="900" Height="620"
         MinWidth="800" MinHeight="500"
-        Background="#0F172A"
+        Background="#1D1D1D"
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
@@ -18,14 +18,14 @@
         </DataTemplate>
 
         <Style x:Key="NavBtn" TargetType="RadioButton">
-            <Setter Property="Background"              Value="Transparent"/>
-            <Setter Property="Foreground"              Value="#94A3B8"/>
-            <Setter Property="BorderThickness"         Value="0"/>
-            <Setter Property="Padding"                 Value="16,10"/>
-            <Setter Property="FontSize"                Value="14"/>
+            <Setter Property="Background"                 Value="Transparent"/>
+            <Setter Property="Foreground"                 Value="#888888"/>
+            <Setter Property="BorderThickness"            Value="0"/>
+            <Setter Property="Padding"                    Value="16,10"/>
+            <Setter Property="FontSize"                   Value="14"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="GroupName"               Value="Nav"/>
-            <Setter Property="Cursor"                  Value="Hand"/>
+            <Setter Property="GroupName"                  Value="Nav"/>
+            <Setter Property="Cursor"                     Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
@@ -35,13 +35,13 @@
                             <ContentPresenter VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked"    Value="True">
-                                <Setter Property="Background" Value="#1E293B"/>
-                                <Setter Property="Foreground" Value="#2DD4BF"/>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Background" Value="#242424"/>
+                                <Setter Property="Foreground" Value="#E5BDDF"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#1E293B"/>
-                                <Setter Property="Foreground" Value="#E2E8F0"/>
+                                <Setter Property="Background" Value="#242424"/>
+                                <Setter Property="Foreground" Value="#E0E0E0"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -57,9 +57,9 @@
         </Grid.ColumnDefinitions>
 
         <!-- Sidebar -->
-        <Border Grid.Column="0" Background="#0B1120" BorderBrush="#1E293B" BorderThickness="0,0,1,0">
+        <Border Grid.Column="0" Background="#141414" BorderBrush="#242424" BorderThickness="0,0,1,0">
             <StackPanel Margin="12,24,12,0">
-                <TextBlock Text="Whisper Flow" Foreground="#F8FAFC"
+                <TextBlock Text="Whisper Flow" Foreground="#F0F0F0"
                            FontSize="15" FontWeight="SemiBold" Margin="16,0,0,24"/>
                 <RadioButton Content="Insights" Style="{StaticResource NavBtn}"
                              IsChecked="True" Click="OnInsightsClick"/>

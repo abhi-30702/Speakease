@@ -11,11 +11,11 @@ public class CountToColorConverter : IValueConverter
         int count = value is int c ? c : 0;
         var hex = count switch
         {
-            0      => "#1E293B",
-            1 or 2 => "#0f5e58",
-            <= 5   => "#0d7a72",
-            <= 9   => "#0d9488",
-            _      => "#2dd4bf"
+            0      => "#242424",
+            1 or 2 => "#6b3f6b",
+            <= 5   => "#8f4f8f",
+            <= 9   => "#b86ab8",
+            _      => "#E5BDDF"
         };
         return new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex));
     }
