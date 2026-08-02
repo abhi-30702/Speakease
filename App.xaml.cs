@@ -88,6 +88,30 @@ public partial class App : System.Windows.Application
 
         // Keyboard hook
         InstallHook();
+
+        // Update check (fire-and-forget; never blocks startup)
+        _ = CheckForUpdatesAsync();
+    }
+
+    private async Task CheckForUpdatesAsync()
+    {
+        var (available, tag) = await UpdateChecker.CheckAsync();
+        if (!available) return;
+
+        _trayIcon!.BalloonTipClicked += OpenReleasesPage;
+        _trayIcon.ShowBalloonTip(
+            6000,
+            "Update available",
+            $"Whisper Flow {tag} is out. Click to download.",
+            ToolTipIcon.Info);
+    }
+
+    private void OpenReleasesPage(object? sender, EventArgs e)
+    {
+        _trayIcon!.BalloonTipClicked -= OpenReleasesPage;
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
+            "https://github.com/abhi-30702/Speakease/releases/latest")
+        { UseShellExecute = true });
     }
 
     private void SetupTray()
@@ -109,6 +133,19 @@ public partial class App : System.Windows.Application
             if (_engine != null) _engine.ToggleMode = toggleItem.Checked;
         };
         menu.Items.Add(toggleItem);
+
+        var startupItem = new ToolStripMenuItem("Start on login")
+        {
+            CheckOnClick = true,
+            Checked      = StartupService.IsEnabled()
+        };
+        startupItem.CheckedChanged += (_, _) =>
+        {
+            if (startupItem.Checked) StartupService.Enable();
+            else                     StartupService.Disable();
+        };
+        menu.Items.Add(startupItem);
+
         menu.Items.Add("Settings", null, (_, _) => ShowMainWindow());
         menu.Items.Add("Quit",     null, (_, _) => Shutdown());
 
