@@ -54,4 +54,5 @@ jobs:
         with:
           name: "Speakease v${{ env.APP_VERSION }}"
           generate_release_notes: true
+          target_commitish: master
           files: installer/output/SpeakeaseSetup.exe
