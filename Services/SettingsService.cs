@@ -17,16 +17,25 @@ public class SettingsService
 
     public SettingsService(string? path = null) => _path = path ?? DefaultPath;
 
+    private static readonly JsonSerializerOptions _jsonOpts = new()
+    {
+        WriteIndented = true,
+        Converters    = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
+    };
+
     public void Load()
     {
         if (!File.Exists(_path)) return;
         try
         {
-            var stored = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(_path)) ?? new();
+            var stored = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(_path), _jsonOpts) ?? new();
             Current = new AppSettings
             {
+                CleanupProvider        = stored.CleanupProvider,
                 GroqApiKey             = DpapiDecrypt(stored.GroqApiKey),
                 GroqModel              = stored.GroqModel,
+                OpenAiApiKey           = DpapiDecrypt(stored.OpenAiApiKey),
+                OpenAiModel            = stored.OpenAiModel,
                 HasCompletedOnboarding = stored.HasCompletedOnboarding,
             };
         }
@@ -38,11 +47,14 @@ public class SettingsService
         Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
         var toWrite = new AppSettings
         {
+            CleanupProvider        = Current.CleanupProvider,
             GroqApiKey             = DpapiEncrypt(Current.GroqApiKey),
             GroqModel              = Current.GroqModel,
+            OpenAiApiKey           = DpapiEncrypt(Current.OpenAiApiKey),
+            OpenAiModel            = Current.OpenAiModel,
             HasCompletedOnboarding = Current.HasCompletedOnboarding,
         };
-        File.WriteAllText(_path, JsonSerializer.Serialize(toWrite, new JsonSerializerOptions { WriteIndented = true }));
+        File.WriteAllText(_path, JsonSerializer.Serialize(toWrite, _jsonOpts));
     }
 
     // DPAPI: encrypted by Windows for this user account only; unreadable by other users or on other machines

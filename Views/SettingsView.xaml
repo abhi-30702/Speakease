@@ -3,39 +3,117 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Background="Transparent">
 
-    <StackPanel Margin="32">
-        <TextBlock Text="Settings" Foreground="#F0F0F0" FontSize="22" FontWeight="Bold" Margin="0,0,0,24"/>
+    <UserControl.Resources>
+        <Style x:Key="ProviderRadio" TargetType="RadioButton">
+            <Setter Property="Foreground"  Value="#CCCCCC"/>
+            <Setter Property="FontSize"    Value="13"/>
+            <Setter Property="Margin"      Value="0,0,0,8"/>
+            <Setter Property="Cursor"      Value="Hand"/>
+            <Setter Property="GroupName"   Value="Provider"/>
+        </Style>
+        <Style x:Key="SectionLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#666666"/>
+            <Setter Property="FontSize"   Value="12"/>
+            <Setter Property="Margin"     Value="0,0,0,4"/>
+        </Style>
+        <Style x:Key="FieldBox" TargetType="Control">
+            <Setter Property="Background"     Value="#1A1A1A28"/>
+            <Setter Property="Foreground"     Value="#F0F0F0"/>
+            <Setter Property="BorderBrush"    Value="#30E5BDDF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding"        Value="8,6"/>
+            <Setter Property="Margin"         Value="0,0,0,16"/>
+        </Style>
+    </UserControl.Resources>
 
-        <Border Background="#28242430" CornerRadius="12" Padding="24" MaxWidth="480" HorizontalAlignment="Left"
-                BorderBrush="#22E5BDDF" BorderThickness="1">
-            <Border.Effect>
-                <DropShadowEffect Color="#E5BDDF" Opacity="0.07"
-                                  BlurRadius="28" ShadowDepth="0" Direction="0"/>
-            </Border.Effect>
-            <StackPanel>
-                <TextBlock Text="Groq API" Foreground="#F0F0F0" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,16"/>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="32">
+            <TextBlock Text="Settings" Foreground="#F0F0F0" FontSize="22" FontWeight="Bold" Margin="0,0,0,24"/>
 
-                <TextBlock Text="API Key" Foreground="#666666" FontSize="12" Margin="0,0,0,4"/>
-                <PasswordBox x:Name="ApiKeyBox"
-                             Background="#1A1A1A28" Foreground="#F0F0F0"
-                             BorderBrush="#30E5BDDF" BorderThickness="1"
-                             Padding="8,6" Margin="0,0,0,16"
-                             PasswordChanged="OnApiKeyChanged"/>
+            <Border Background="#28242430" CornerRadius="12" Padding="24" MaxWidth="520" HorizontalAlignment="Left"
+                    BorderBrush="#22E5BDDF" BorderThickness="1">
+                <Border.Effect>
+                    <DropShadowEffect Color="#E5BDDF" Opacity="0.07" BlurRadius="28" ShadowDepth="0" Direction="0"/>
+                </Border.Effect>
+                <StackPanel>
 
-                <TextBlock Text="Model" Foreground="#666666" FontSize="12" Margin="0,0,0,4"/>
-                <ComboBox ItemsSource="{Binding AvailableModels}"
-                          SelectedItem="{Binding SelectedModel}"
-                          Background="#1A1A1A28" Foreground="#F0F0F0"
-                          BorderBrush="#30E5BDDF" Padding="8,6" Margin="0,0,0,24"/>
+                    <!-- Provider selection -->
+                    <TextBlock Text="AI Cleanup" Foreground="#F0F0F0" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <TextBlock Text="Choose how Speakease cleans up transcribed text after dictation."
+                               Foreground="#555566" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,16"/>
 
-                <StackPanel Orientation="Horizontal">
-                    <Button Content="Save" Command="{Binding SaveCommand}"
-                            Background="#E5BDDF" Foreground="#1D1D1D"
-                            BorderThickness="0" Padding="16,8" Cursor="Hand"/>
-                    <TextBlock Text="{Binding SaveStatus}" Foreground="#E5BDDF"
-                               VerticalAlignment="Center" Margin="12,0,0,0"/>
+                    <RadioButton Content="Local only  —  fast regex cleanup, no API key needed"
+                                 Style="{StaticResource ProviderRadio}"
+                                 IsChecked="{Binding IsLocalSelected, Mode=TwoWay}"/>
+                    <RadioButton Content="Groq  —  free tier, very fast"
+                                 Style="{StaticResource ProviderRadio}"
+                                 IsChecked="{Binding IsGroqSelected, Mode=TwoWay}"/>
+                    <RadioButton Content="OpenAI  —  GPT-4o / GPT-3.5"
+                                 Style="{StaticResource ProviderRadio}"
+                                 IsChecked="{Binding IsOpenAiSelected, Mode=TwoWay}"
+                                 Margin="0,0,0,20"/>
+
+                    <!-- Groq section -->
+                    <StackPanel Visibility="{Binding GroqSectionVisibility}">
+                        <Separator Background="#22E5BDDF" Margin="0,0,0,16"/>
+                        <TextBlock Text="Groq" Foreground="#E5BDDF" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+                        <TextBlock Text="API Key" Style="{StaticResource SectionLabel}"/>
+                        <PasswordBox x:Name="GroqApiKeyBox"
+                                     Style="{StaticResource FieldBox}"
+                                     PasswordChanged="OnGroqKeyChanged"/>
+
+                        <TextBlock Text="Model" Style="{StaticResource SectionLabel}"/>
+                        <ComboBox ItemsSource="{Binding GroqModels}"
+                                  SelectedItem="{Binding SelectedGroqModel}"
+                                  Style="{StaticResource FieldBox}"
+                                  Margin="0,0,0,20"/>
+
+                        <TextBlock FontSize="11" Foreground="#444455" TextWrapping="Wrap" Margin="0,0,0,4">
+                            <Run Text="Get a free API key at "/>
+                            <Hyperlink NavigateUri="https://console.groq.com" RequestNavigate="OnHyperlinkNavigate">
+                                console.groq.com
+                            </Hyperlink>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <!-- OpenAI section -->
+                    <StackPanel Visibility="{Binding OpenAiSectionVisibility}">
+                        <Separator Background="#22E5BDDF" Margin="0,0,0,16"/>
+                        <TextBlock Text="OpenAI" Foreground="#E5BDDF" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+                        <TextBlock Text="API Key" Style="{StaticResource SectionLabel}"/>
+                        <PasswordBox x:Name="OpenAiApiKeyBox"
+                                     Style="{StaticResource FieldBox}"
+                                     PasswordChanged="OnOpenAiKeyChanged"/>
+
+                        <TextBlock Text="Model" Style="{StaticResource SectionLabel}"/>
+                        <ComboBox ItemsSource="{Binding OpenAiModels}"
+                                  SelectedItem="{Binding SelectedOpenAiModel}"
+                                  Style="{StaticResource FieldBox}"
+                                  Margin="0,0,0,20"/>
+
+                        <TextBlock FontSize="11" Foreground="#444455" TextWrapping="Wrap" Margin="0,0,0,4">
+                            <Run Text="Get an API key at "/>
+                            <Hyperlink NavigateUri="https://platform.openai.com/api-keys" RequestNavigate="OnHyperlinkNavigate">
+                                platform.openai.com/api-keys
+                            </Hyperlink>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <Separator Background="#22E5BDDF" Margin="0,16,0,16"/>
+
+                    <!-- Save -->
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Save" Command="{Binding SaveCommand}"
+                                Background="#E5BDDF" Foreground="#1D1D1D"
+                                BorderThickness="0" Padding="16,8" Cursor="Hand"/>
+                        <TextBlock Text="{Binding SaveStatus}" Foreground="#E5BDDF"
+                                   VerticalAlignment="Center" Margin="12,0,0,0"/>
+                    </StackPanel>
+
                 </StackPanel>
-            </StackPanel>
-        </Border>
-    </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

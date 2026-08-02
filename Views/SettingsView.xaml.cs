@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Navigation;
 using WhisperFlowLocal.ViewModels;
 
 namespace WhisperFlowLocal.Views;
@@ -15,12 +17,27 @@ public partial class SettingsView : System.Windows.Controls.UserControl
     private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
         if (e.NewValue is SettingsViewModel vm)
-            ApiKeyBox.Password = vm.GroqApiKey;
+        {
+            GroqApiKeyBox.Password   = vm.GroqApiKey;
+            OpenAiApiKeyBox.Password = vm.OpenAiApiKey;
+        }
     }
 
-    private void OnApiKeyChanged(object sender, RoutedEventArgs e)
+    private void OnGroqKeyChanged(object sender, RoutedEventArgs e)
     {
         if (DataContext is SettingsViewModel vm)
-            vm.GroqApiKey = ApiKeyBox.Password;
+            vm.GroqApiKey = GroqApiKeyBox.Password;
+    }
+
+    private void OnOpenAiKeyChanged(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is SettingsViewModel vm)
+            vm.OpenAiApiKey = OpenAiApiKeyBox.Password;
+    }
+
+    private void OnHyperlinkNavigate(object sender, RequestNavigateEventArgs e)
+    {
+        Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+        e.Handled = true;
     }
 }

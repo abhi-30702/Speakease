@@ -47,7 +47,8 @@ public partial class App : System.Windows.Application
         var transcription = new TranscriptionService(modelPath);
         var regex      = new RegexCleanupService();
         var groq       = new GroqCleanupService(new HttpClient(), settingsService);
-        var cleanup    = new TieredCleanupService(groq, regex);
+        var openAi     = new OpenAiCleanupService(new HttpClient(), settingsService);
+        var cleanup    = new TieredCleanupService(groq, openAi, regex, settingsService);
         var insertion  = new InsertionService(focus);
 
         // First-run onboarding (ShowDialog blocks until window closes)

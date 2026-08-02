@@ -1,30 +1,36 @@
 using System.Net;
 using System.Net.Http;
+using WhisperFlowLocal.Models;
 using WhisperFlowLocal.Services;
 
 namespace WhisperFlowLocal.Tests;
 
 public class TieredCleanupServiceTests
 {
-    private static GroqCleanupService GroqWith(string responseBody, HttpStatusCode code = HttpStatusCode.OK)
+    private static TieredCleanupService GroqTiered(string responseBody, HttpStatusCode code = HttpStatusCode.OK)
     {
         var settings = new SettingsService();
         settings.Current.GroqApiKey = "gsk_test";
-        return new GroqCleanupService(new HttpClient(new FakeHandler2(responseBody, code)), settings);
+        settings.Current.CleanupProvider = CleanupProvider.Groq;
+        var groq   = new GroqCleanupService(new HttpClient(new FakeHandler2(responseBody, code)), settings);
+        var openAi = new OpenAiCleanupService(new HttpClient(new FakeHandler2("", HttpStatusCode.OK)), settings);
+        return new TieredCleanupService(groq, openAi, new RegexCleanupService(), settings);
     }
 
-    private static GroqCleanupService GroqUnavailable()
+    private static TieredCleanupService GroqUnavailableTiered()
     {
-        var settings = new SettingsService(); // no key → IsAvailable = false
-        return new GroqCleanupService(new HttpClient(new FakeHandler2("", HttpStatusCode.OK)), settings);
+        var settings = new SettingsService();
+        settings.Current.CleanupProvider = CleanupProvider.Groq; // no key → IsAvailable=false
+        var groq   = new GroqCleanupService(new HttpClient(new FakeHandler2("", HttpStatusCode.OK)), settings);
+        var openAi = new OpenAiCleanupService(new HttpClient(new FakeHandler2("", HttpStatusCode.OK)), settings);
+        return new TieredCleanupService(groq, openAi, new RegexCleanupService(), settings);
     }
 
     [Fact]
     public async Task CleanAsync_GroqSucceeds_ReturnsGroqResult()
     {
         const string json = """{"choices":[{"message":{"content":"Groq cleaned."}}]}""";
-        var svc = new TieredCleanupService(GroqWith(json), new RegexCleanupService());
-        var result = await svc.CleanAsync("raw text");
+        var result = await GroqTiered(json).CleanAsync("raw text");
         Assert.Equal("groq", result.Tier);
         Assert.Equal("Groq cleaned.", result.Text);
     }
@@ -32,18 +38,14 @@ public class TieredCleanupServiceTests
     [Fact]
     public async Task CleanAsync_GroqThrows_FallsBackToRegex()
     {
-        var svc = new TieredCleanupService(
-            GroqWith("err", HttpStatusCode.InternalServerError),
-            new RegexCleanupService());
-        var result = await svc.CleanAsync("hello world");
+        var result = await GroqTiered("err", HttpStatusCode.InternalServerError).CleanAsync("hello world");
         Assert.Equal("regex", result.Tier);
     }
 
     [Fact]
     public async Task CleanAsync_GroqUnavailable_UsesRegexDirectly()
     {
-        var svc = new TieredCleanupService(GroqUnavailable(), new RegexCleanupService());
-        var result = await svc.CleanAsync("hello world");
+        var result = await GroqUnavailableTiered().CleanAsync("hello world");
         Assert.Equal("regex", result.Tier);
     }
 }
