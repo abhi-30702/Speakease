@@ -33,6 +33,7 @@ public partial class OnboardingWindow : Window
         Step4Panel.Visibility = step == 4 ? Visibility.Visible : Visibility.Collapsed;
 
         BackButton.Visibility = step > 1 ? Visibility.Visible : Visibility.Collapsed;
+        BackButton.IsEnabled  = !(step == 2 && _downloadInProgress);
         NextButton.Content    = step == 1 ? "Get started →" : step == 4 ? "Done" : "Next →";
         NextButton.IsEnabled  = step != 2 || _modelReady;
 
@@ -93,7 +94,8 @@ public partial class OnboardingWindow : Window
         }
         finally
         {
-            _downloadInProgress = false;
+            _downloadInProgress   = false;
+            BackButton.IsEnabled  = true;
         }
     }
 
