@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media.Animation;
-using System.Windows.Shapes;
+using Rectangle = System.Windows.Shapes.Rectangle;
 using System.Windows.Threading;
 using Microsoft.Win32;
 using WhisperFlowLocal.Models;
