@@ -6,8 +6,14 @@
         Title="Speakease"
         Width="900" Height="620"
         MinWidth="800" MinHeight="500"
-        Background="#1D1D1D"
         WindowStartupLocation="CenterScreen">
+    <Window.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#1A1A2E" Offset="0"/>
+            <GradientStop Color="#16162A" Offset="0.5"/>
+            <GradientStop Color="#1D1224" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Background>
 
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:InsightsViewModel}">
@@ -36,11 +42,11 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter Property="Background" Value="#242424"/>
+                                <Setter Property="Background" Value="#35E5BDDF"/>
                                 <Setter Property="Foreground" Value="#E5BDDF"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#242424"/>
+                                <Setter Property="Background" Value="#18E5BDDF"/>
                                 <Setter Property="Foreground" Value="#E0E0E0"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -57,7 +63,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Sidebar -->
-        <Border Grid.Column="0" Background="#141414" BorderBrush="#242424" BorderThickness="0,0,1,0">
+        <Border Grid.Column="0" Background="#B0141422" BorderBrush="#30E5BDDF" BorderThickness="0,0,1,0">
             <StackPanel Margin="12,24,12,0">
                 <TextBlock Text="Speakease" Foreground="#F0F0F0"
                            FontSize="15" FontWeight="SemiBold" Margin="16,0,0,24"/>

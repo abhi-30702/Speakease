@@ -56,7 +56,7 @@ public partial class DictationEngine : ObservableObject
 
     private void StartRecording()
     {
-        _focus.CaptureForegroudWindow();
+        _focus.CaptureForegroundWindow();
         _currentAppName = _focus.GetForegroundAppName();
         _currentAppTitle = _focus.GetForegroundWindowTitle();
         _recordingTimer.Restart();

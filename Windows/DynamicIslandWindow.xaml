@@ -19,10 +19,15 @@
 
     <Grid>
         <!-- Black rounded capsule — Collapsed at idle, animated open on recording -->
-        <Border x:Name="Capsule" CornerRadius="25" Background="#000000"
+        <Border x:Name="Capsule" CornerRadius="25" Background="#F0000000"
+                BorderBrush="#18E5BDDF" BorderThickness="1"
                 Width="0" Height="36"
                 HorizontalAlignment="Center" VerticalAlignment="Center"
                 Visibility="Collapsed" ClipToBounds="True">
+            <Border.Effect>
+                <DropShadowEffect Color="#E5BDDF" Opacity="0.22"
+                                  BlurRadius="18" ShadowDepth="0" Direction="0"/>
+            </Border.Effect>
             <Grid Margin="14,0">
 
                 <!-- RECORDING: 10 animated waveform bars + "Listening" label -->

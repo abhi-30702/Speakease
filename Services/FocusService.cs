@@ -6,7 +6,7 @@ public class FocusService
 {
     private IntPtr _capturedHwnd = IntPtr.Zero;
 
-    public void CaptureForegroudWindow()
+    public void CaptureForegroundWindow()
         => _capturedHwnd = NativeMethods.GetForegroundWindow();
 
     public void RestoreFocus()

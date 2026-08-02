@@ -102,7 +102,7 @@ public partial class App : System.Windows.Application
         _trayIcon.ShowBalloonTip(
             6000,
             "Update available",
-            $"Whisper Flow {tag} is out. Click to download.",
+            $"Speakease {tag} is out. Click to download.",
             ToolTipIcon.Info);
     }
 
