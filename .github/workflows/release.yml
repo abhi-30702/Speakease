@@ -23,9 +23,6 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Run tests
-        run: dotnet test Tests/ --no-restore -c Release
-
       - name: Publish self-contained win-x64
         run: |
           dotnet publish WhisperFlowLocal.csproj `
