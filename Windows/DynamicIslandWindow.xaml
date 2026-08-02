@@ -1,0 +1,70 @@
+<Window x:Class="WhisperFlowLocal.Windows.DynamicIslandWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="" Width="240" Height="50"
+        AllowsTransparency="True" Background="Transparent"
+        WindowStyle="None" Topmost="True"
+        ShowInTaskbar="False" ShowActivated="False"
+        Focusable="False" IsHitTestVisible="False"
+        ResizeMode="NoResize">
+
+    <Window.Resources>
+        <!-- Spinner: rotates a dashed arc 360° in 1 s, forever -->
+        <Storyboard x:Key="SpinnerAnim" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="SpinnerRotate"
+                             Storyboard.TargetProperty="Angle"
+                             From="0" To="360" Duration="0:0:1"/>
+        </Storyboard>
+    </Window.Resources>
+
+    <Grid>
+        <!-- Black rounded capsule — Collapsed at idle, animated open on recording -->
+        <Border x:Name="Capsule" CornerRadius="25" Background="#000000"
+                Width="0" Height="36"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                Visibility="Collapsed" ClipToBounds="True">
+            <Grid Margin="14,0">
+
+                <!-- RECORDING: 10 animated waveform bars + "Listening" label -->
+                <StackPanel x:Name="RecordingContent" Orientation="Horizontal"
+                            VerticalAlignment="Center" HorizontalAlignment="Center"
+                            Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,8,0">
+                        <Rectangle x:Name="Bar0" Width="2" Height="8"  Fill="#E5BDDF" Margin="1,0" RadiusX="1" RadiusY="1" VerticalAlignment="Center"/>
+                        <Rectangle x:Name="Bar1" Width="2" Height="12" Fill="#E5BDDF" Margin="1,0" RadiusX="1" RadiusY="1" VerticalAlignment="Center"/>
+                        <Rectangle x:Name="Bar2" Width="2" Height="6"  Fill="#E5BDDF" Margin="1,0" RadiusX="1" RadiusY="1" VerticalAlignment="Center"/>
+                        <Rectangle x:Name="Bar3" Width="2" Height="14" Fill="#E5BDDF" Margin="1,0" RadiusX="1" RadiusY="1" VerticalAlignment="Center"/>
+                        <Rectangle x:Name="Bar4" Width="2" Height="9"  Fill="#E5BDDF" Margin="1,0" RadiusX="1" RadiusY="1" VerticalAlignment="Center"/>
+                        <Rectangle x:Name="Bar5" Width="2" Height="11" Fill="#E5BDDF" Margin="1,0" RadiusX="1" RadiusY="1" VerticalAlignment="Center"/>
+                        <Rectangle x:Name="Bar6" Width="2" Height="5"  Fill="#E5BDDF" Margin="1,0" RadiusX="1" RadiusY="1" VerticalAlignment="Center"/>
+                        <Rectangle x:Name="Bar7" Width="2" Height="13" Fill="#E5BDDF" Margin="1,0" RadiusX="1" RadiusY="1" VerticalAlignment="Center"/>
+                        <Rectangle x:Name="Bar8" Width="2" Height="7"  Fill="#E5BDDF" Margin="1,0" RadiusX="1" RadiusY="1" VerticalAlignment="Center"/>
+                        <Rectangle x:Name="Bar9" Width="2" Height="10" Fill="#E5BDDF" Margin="1,0" RadiusX="1" RadiusY="1" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="Listening" Foreground="#E5BDDF" FontSize="11" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- TRANSCRIBING: spinning arc + "Transcribing…" label -->
+                <StackPanel x:Name="TranscribingContent" Orientation="Horizontal"
+                            VerticalAlignment="Center" HorizontalAlignment="Center"
+                            Visibility="Collapsed">
+                    <Ellipse Width="14" Height="14"
+                             Stroke="#E5BDDF" StrokeThickness="1.5"
+                             StrokeDashArray="6 2" Margin="0,0,8,0"
+                             RenderTransformOrigin="0.5,0.5">
+                        <Ellipse.RenderTransform>
+                            <RotateTransform x:Name="SpinnerRotate"/>
+                        </Ellipse.RenderTransform>
+                    </Ellipse>
+                    <TextBlock Text="Transcribing…" Foreground="#888888" FontSize="11" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- ERROR: short error text, auto-dismissed after 3 s -->
+                <TextBlock x:Name="ErrorContent" Foreground="#E5BDDF" FontSize="10"
+                           VerticalAlignment="Center" HorizontalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"
+                           Visibility="Collapsed"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
