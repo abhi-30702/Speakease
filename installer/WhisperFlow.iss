@@ -9,8 +9,6 @@
 #define MyAppExeName   "WhisperFlowLocal.exe"
 #define MyAppPublisher "Abhishek K"
 #define MyAppURL       "https://github.com/abhi-30702/Speakease"
-#define MyAppRoot      "{#SourcePath}\.."
-
 [Setup]
 AppId={{B8F4C2A1-9D3E-4F7B-A5C6-8E2D1F0B9A3C}
 AppName={#MyAppName}
@@ -39,7 +37,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
-Source: "{#MyAppRoot}\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
