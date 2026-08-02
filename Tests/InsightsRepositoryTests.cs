@@ -69,4 +69,15 @@ public class InsightsRepositoryTests
         var stats = await repo.GetVoiceStatsAsync();
         Assert.Equal(50.0, stats.GroqUsagePct);
     }
+
+    [Fact]
+    public async Task ClearAll_RemovesAllRecords()
+    {
+        var repo = await MakeAsync();
+        await repo.RecordAsync(MakeRecord());
+        await repo.RecordAsync(MakeRecord());
+        await repo.ClearAllAsync();
+        Assert.Equal(0, await repo.GetTotalWordsAsync());
+        Assert.Equal(0, await repo.GetTotalFixesAsync());
+    }
 }

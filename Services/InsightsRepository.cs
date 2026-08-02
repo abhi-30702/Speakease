@@ -147,5 +147,12 @@ public class InsightsRepository : IDisposable
         return new VoiceStats(avgDur, avgConf, stdDev, groqPct);
     }
 
+    public async Task ClearAllAsync()
+    {
+        using var cmd = Conn.CreateCommand();
+        cmd.CommandText = "DELETE FROM dictations";
+        await cmd.ExecuteNonQueryAsync();
+    }
+
     public void Dispose() => _conn?.Dispose();
 }

@@ -23,6 +23,20 @@ public partial class InsightsViewModel : ObservableObject
     public InsightsViewModel(InsightsRepository repo) => _repo = repo;
 
     [RelayCommand]
+    private async Task ClearHistoryAsync()
+    {
+        var answer = System.Windows.MessageBox.Show(
+            "This will permanently delete all your dictation history and Insights data. Continue?",
+            "Clear history",
+            System.Windows.MessageBoxButton.YesNo,
+            System.Windows.MessageBoxImage.Warning);
+
+        if (answer != System.Windows.MessageBoxResult.Yes) return;
+        await _repo.ClearAllAsync();
+        await RefreshAsync();
+    }
+
+    [RelayCommand]
     public async Task RefreshAsync()
     {
         IsLoading = true;

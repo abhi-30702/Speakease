@@ -40,11 +40,18 @@
             <!-- Header row -->
             <Grid Margin="0,0,0,20">
                 <TextBlock Text="Insights" Foreground="#F0F0F0" FontSize="22" FontWeight="Bold"/>
-                <Button Content="Refresh" HorizontalAlignment="Right"
-                        Command="{Binding RefreshCommand}"
-                        Background="#20E5BDDF" Foreground="#E5BDDF"
-                        BorderBrush="#30E5BDDF" BorderThickness="1"
-                        Padding="12,6" Cursor="Hand"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Clear history" Margin="0,0,8,0"
+                            Command="{Binding ClearHistoryCommand}"
+                            Background="#18FF6B6B" Foreground="#FF6B6B"
+                            BorderBrush="#30FF6B6B" BorderThickness="1"
+                            Padding="12,6" Cursor="Hand"/>
+                    <Button Content="Refresh"
+                            Command="{Binding RefreshCommand}"
+                            Background="#20E5BDDF" Foreground="#E5BDDF"
+                            BorderBrush="#30E5BDDF" BorderThickness="1"
+                            Padding="12,6" Cursor="Hand"/>
+                </StackPanel>
             </Grid>
 
             <!-- Tabs -->

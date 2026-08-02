@@ -1,4 +1,5 @@
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using Whisper.net;
 using Whisper.net.Ggml;
@@ -25,13 +26,57 @@ public class TranscriptionService : IAsyncDisposable
         {
             progress?.Report("Downloading small.en model (~465 MB)...");
             await DownloadModelAsync(_modelPath);
+            await WriteHashSidecarAsync(_modelPath);
             progress?.Report("Model downloaded.");
         }
+        else
+        {
+            await VerifyIntegrityAsync(_modelPath, progress);
+        }
+
         _factory = WhisperFactory.FromPath(_modelPath);
         _processor = _factory.CreateBuilder()
             .WithLanguage("en")
             .WithProbabilities()
             .Build();
+    }
+
+    private static async Task VerifyIntegrityAsync(string modelPath, IProgress<string>? progress)
+    {
+        var hashPath = modelPath + ".sha256";
+
+        if (!File.Exists(hashPath))
+        {
+            // First run after this update: record a baseline hash for future checks
+            await WriteHashSidecarAsync(modelPath);
+            return;
+        }
+
+        var storedHash  = (await File.ReadAllTextAsync(hashPath)).Trim();
+        var currentHash = await ComputeSha256Async(modelPath);
+
+        if (!string.Equals(currentHash, storedHash, StringComparison.OrdinalIgnoreCase))
+        {
+            // Model file has been tampered with — delete both and re-download
+            progress?.Report("Model integrity check failed — re-downloading...");
+            File.Delete(modelPath);
+            File.Delete(hashPath);
+            await DownloadModelAsync(modelPath);
+            await WriteHashSidecarAsync(modelPath);
+        }
+    }
+
+    private static async Task WriteHashSidecarAsync(string modelPath)
+    {
+        var hash = await ComputeSha256Async(modelPath);
+        await File.WriteAllTextAsync(modelPath + ".sha256", hash);
+    }
+
+    private static async Task<string> ComputeSha256Async(string path)
+    {
+        await using var fs = File.OpenRead(path);
+        var bytes = await SHA256.HashDataAsync(fs);
+        return Convert.ToHexString(bytes).ToLowerInvariant();
     }
 
     private static async Task DownloadModelAsync(string destPath)

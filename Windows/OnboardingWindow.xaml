@@ -36,6 +36,9 @@
                 <TextBlock Text="Dictate into any app. Text appears at your cursor — no clipboard, no cloud."
                            Foreground="#888888" FontSize="13"
                            TextAlignment="Center" TextWrapping="Wrap" MaxWidth="380"/>
+                <TextBlock Text="Your dictation history is stored locally on this device only. You can clear it anytime from the Insights tab."
+                           Foreground="#444455" FontSize="11"
+                           TextAlignment="Center" TextWrapping="Wrap" MaxWidth="380" Margin="0,14,0,0"/>
             </StackPanel>
 
             <!-- Step 2: Model download -->

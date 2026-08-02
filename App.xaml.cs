@@ -17,6 +17,7 @@ public partial class App : System.Windows.Application
     private NotifyIcon? _trayIcon;
     private IntPtr _hookHandle = IntPtr.Zero;
     private NativeMethods.LowLevelKeyboardProc? _hookProc;
+    private System.Windows.Threading.DispatcherTimer? _hookHealthTimer;
     private DictationEngine? _engine;
     private DynamicIslandWindow? _pillWindow;
     private Windows.MainWindow? _mainWindow;
@@ -88,6 +89,14 @@ public partial class App : System.Windows.Application
 
         // Keyboard hook
         InstallHook();
+
+        // Re-install hook if OS drops it (e.g. hook timeout, integration with accessibility software)
+        _hookHealthTimer = new System.Windows.Threading.DispatcherTimer
+        {
+            Interval = TimeSpan.FromMinutes(5)
+        };
+        _hookHealthTimer.Tick += (_, _) => { if (_hookHandle == IntPtr.Zero) InstallHook(); };
+        _hookHealthTimer.Start();
 
         // Update check (fire-and-forget; never blocks startup)
         _ = CheckForUpdatesAsync();
@@ -198,6 +207,7 @@ public partial class App : System.Windows.Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _hookHealthTimer?.Stop();
         if (_hookHandle != IntPtr.Zero)
         {
             NativeMethods.UnhookWindowsHookEx(_hookHandle);
