@@ -105,5 +105,5 @@ public partial class DictationEngine : ObservableObject
     }
 
     private static int CountWords(string s) =>
-        s.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+        s.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).Length;
 }
