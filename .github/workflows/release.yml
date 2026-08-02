@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
@@ -36,6 +38,9 @@ jobs:
         run: |
           $version = "${{ github.ref_name }}".TrimStart('v')
           "APP_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Install Inno Setup 6
+        run: choco install innosetup --no-progress -y
 
       - name: Compile installer
         shell: pwsh
