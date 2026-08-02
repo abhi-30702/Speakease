@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Text;
 using WhisperFlowLocal.Interop;
 
 namespace WhisperFlowLocal.Services;
@@ -9,11 +10,28 @@ public class InsertionService(FocusService focusService)
     {
         if (string.IsNullOrEmpty(text)) return true;
 
+        text = StripControlChars(text);
+        if (string.IsNullOrEmpty(text)) return true;
+
         focusService.RestoreFocus();
 
         var inputs = BuildInputArray(text);
         uint sent = NativeMethods.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf<NativeMethods.INPUT>());
         return sent == (uint)inputs.Length;
+    }
+
+    // Allow printable Unicode + space. Replace \t/\r/\n with a space.
+    // Block all ASCII control chars (0x00-0x1F, 0x7F) to prevent hotkey injection.
+    public static string StripControlChars(string text)
+    {
+        var sb = new StringBuilder(text.Length);
+        foreach (char c in text)
+        {
+            if (c == '\t' || c == '\n' || c == '\r') { sb.Append(' '); continue; }
+            if (c < 0x20 || c == 0x7F) continue;
+            sb.Append(c);
+        }
+        return sb.ToString().Trim();
     }
 
     public static NativeMethods.INPUT[] BuildInputArray(string text)

@@ -50,4 +50,25 @@ public class InsertionServiceTests
         var inputs = InsertionService.BuildInputArray("H");
         Assert.Equal((ushort)'H', inputs[0].U.ki.wScan);
     }
+
+    [Fact]
+    public void StripControlChars_RemovesEscapeAndBackspace()
+    {
+        var result = InsertionService.StripControlChars("hello\x1b\x08world");
+        Assert.Equal("helloworld", result);
+    }
+
+    [Fact]
+    public void StripControlChars_ReplacesNewlineWithSpace()
+    {
+        var result = InsertionService.StripControlChars("hello\nworld");
+        Assert.Equal("hello world", result);
+    }
+
+    [Fact]
+    public void StripControlChars_AllowsPrintableUnicode()
+    {
+        var result = InsertionService.StripControlChars("café résumé");
+        Assert.Equal("café résumé", result);
+    }
 }
