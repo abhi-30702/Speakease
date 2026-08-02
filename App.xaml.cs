@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.IO;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Forms;
@@ -18,59 +20,75 @@ public partial class App : System.Windows.Application
     private DictationEngine? _engine;
     private PillWindow? _pillWindow;
     private Windows.MainWindow? _mainWindow;
+    private MainViewModel? _mainVm;
+    private InsightsViewModel? _insightsVm;
     private InsightsRepository? _insights;
 
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
 
+        // Settings
         var settingsService = new SettingsService();
         settingsService.Load();
 
-        var dbPath = System.IO.Path.Combine(
+        // Insights DB
+        var dbPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "WhisperFlowLocal", "insights.db");
         _insights = new InsightsRepository(dbPath);
         await _insights.InitAsync();
 
-        var focus = new FocusService();
-        var audio = new AudioCaptureService();
-        var modelPath = System.IO.Path.Combine(AppContext.BaseDirectory, "Resources", "Models", "ggml-small.en.bin");
+        // Core services
+        var focus      = new FocusService();
+        var audio      = new AudioCaptureService();
+        var modelPath  = Path.Combine(AppContext.BaseDirectory, "Resources", "Models", "ggml-small.en.bin");
         var transcription = new TranscriptionService(modelPath);
-        var regex = new RegexCleanupService();
-        var groq = new GroqCleanupService(new System.Net.Http.HttpClient(), settingsService);
-        var cleanup = new TieredCleanupService(groq, regex);
-        var insertion = new InsertionService(focus);
+        var regex      = new RegexCleanupService();
+        var groq       = new GroqCleanupService(new HttpClient(), settingsService);
+        var cleanup    = new TieredCleanupService(groq, regex);
+        var insertion  = new InsertionService(focus);
 
+        // Tray + model load
         SetupTray();
         _trayIcon!.ShowBalloonTip(3000, "Whisper Flow", "Loading speech model...", ToolTipIcon.Info);
         await transcription.InitializeAsync();
         _trayIcon.ShowBalloonTip(2000, "Whisper Flow", "Ready. Hold Ctrl+Space to dictate.", ToolTipIcon.Info);
 
-        // Engine + pill
-        _engine = new DictationEngine(audio, transcription, cleanup, insertion, focus, _insights!);
+        // Engine
+        _engine = new DictationEngine(audio, transcription, cleanup, insertion, focus, _insights);
+
+        // Pill
         var pillVm = new PillViewModel();
         pillVm.SyncFrom(_engine);
         _pillWindow = new PillWindow(pillVm);
 
-        // Low-level keyboard hook for Ctrl+Space
+        // ViewModels
+        _insightsVm = new InsightsViewModel(_insights);
+        var settingsVm = new SettingsViewModel(settingsService);
+        _mainVm = new MainViewModel(_insightsVm, settingsVm);
+
+        // Refresh Insights after each dictation (marshal to UI thread)
+        _engine.DictationCompleted += () =>
+            Dispatcher.BeginInvoke(() => _ = _insightsVm.RefreshAsync());
+
+        // Keyboard hook
         InstallHook();
     }
 
     private void SetupTray()
     {
-        var iconUri = new Uri("pack://application:,,,/Resources/tray-icon.ico");
+        var iconUri    = new Uri("pack://application:,,,/Resources/tray-icon.ico");
         var iconStream = GetResourceStream(iconUri)?.Stream;
 
         _trayIcon = new NotifyIcon
         {
-            Icon = iconStream != null ? new System.Drawing.Icon(iconStream) : SystemIcons.Application,
+            Icon    = iconStream != null ? new System.Drawing.Icon(iconStream) : SystemIcons.Application,
             Visible = true,
-            Text = "Whisper Flow Local"
+            Text    = "Whisper Flow Local"
         };
 
-        var menu = new ContextMenuStrip();
-
+        var menu       = new ContextMenuStrip();
         var toggleItem = new ToolStripMenuItem("Toggle Mode") { CheckOnClick = true };
         toggleItem.CheckedChanged += (_, _) =>
         {
@@ -78,15 +96,19 @@ public partial class App : System.Windows.Application
         };
         menu.Items.Add(toggleItem);
         menu.Items.Add("Settings", null, (_, _) => ShowMainWindow());
-        menu.Items.Add("Quit", null, (_, _) => Shutdown());
+        menu.Items.Add("Quit",     null, (_, _) => Shutdown());
 
         _trayIcon.ContextMenuStrip = menu;
-        _trayIcon.DoubleClick += (_, _) => ShowMainWindow();
+        _trayIcon.DoubleClick     += (_, _) => ShowMainWindow();
     }
 
     private void ShowMainWindow()
     {
-        _mainWindow ??= new Windows.MainWindow();
+        if (_mainWindow == null)
+        {
+            _mainWindow = new Windows.MainWindow(_mainVm!);
+            _mainWindow.Closed += (_, _) => _mainWindow = null;
+        }
         _mainWindow.Show();
         _mainWindow.Activate();
     }
@@ -95,7 +117,7 @@ public partial class App : System.Windows.Application
     {
         _hookProc = LowLevelKeyboardHook;
         using var curProcess = Process.GetCurrentProcess();
-        using var curModule = curProcess.MainModule!;
+        using var curModule  = curProcess.MainModule!;
         _hookHandle = NativeMethods.SetWindowsHookEx(
             NativeMethods.WH_KEYBOARD_LL,
             _hookProc,
@@ -107,8 +129,8 @@ public partial class App : System.Windows.Application
     {
         if (nCode >= 0)
         {
-            var kb = Marshal.PtrToStructure<NativeMethods.KBDLLHOOKSTRUCT>(lParam);
-            bool isSpace = kb.vkCode == NativeMethods.VK_SPACE;
+            var kb       = Marshal.PtrToStructure<NativeMethods.KBDLLHOOKSTRUCT>(lParam);
+            bool isSpace  = kb.vkCode == NativeMethods.VK_SPACE;
             bool ctrlDown = (NativeMethods.GetAsyncKeyState(NativeMethods.VK_CONTROL) & 0x8000) != 0;
 
             if (isSpace && ctrlDown)
