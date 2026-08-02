@@ -81,18 +81,22 @@ public class TranscriptionService : IAsyncDisposable
 
     private static async Task DownloadModelAsync(string destPath)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(destPath)!);
-        var tmpPath = destPath + ".tmp";
+        var dir = Path.GetDirectoryName(destPath)!;
+        Directory.CreateDirectory(dir);
+
+        // Unique name per attempt so a stale/locked .tmp from a prior crash never blocks us
+        var tmpPath = Path.Combine(dir, Path.GetFileName(destPath) + "." + Guid.NewGuid().ToString("N") + ".tmp");
         try
         {
             using var modelStream = await WhisperGgmlDownloader.GetGgmlModelAsync(GgmlType.SmallEn);
-            await using var fs = File.Create(tmpPath);
+            // FileShare.Read lets AV scanners read while we write, avoiding the lock error
+            await using var fs = new FileStream(tmpPath, FileMode.Create, FileAccess.Write, FileShare.Read);
             await modelStream.CopyToAsync(fs);
             File.Move(tmpPath, destPath, overwrite: true);
         }
         catch
         {
-            if (File.Exists(tmpPath)) File.Delete(tmpPath);
+            try { File.Delete(tmpPath); } catch { }
             throw;
         }
     }
