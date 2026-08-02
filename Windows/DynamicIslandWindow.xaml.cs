@@ -15,6 +15,7 @@ public partial class DynamicIslandWindow : Window
     private readonly DispatcherTimer _waveformTimer;
     private readonly Storyboard _spinnerAnim;
     private Rectangle[] _bars = [];
+    private DispatcherTimer? _errorDismissTimer;
 
     public DynamicIslandWindow(DynamicIslandViewModel vm)
     {
@@ -27,7 +28,7 @@ public partial class DynamicIslandWindow : Window
         // Clone so the resource Storyboard is independently controllable
         _spinnerAnim = ((Storyboard)FindResource("SpinnerAnim")).Clone();
 
-        Loaded += (_, _) => _bars = [Bar0, Bar1, Bar2, Bar3, Bar4, Bar5, Bar6, Bar7, Bar8, Bar9];
+        _bars = [Bar0, Bar1, Bar2, Bar3, Bar4, Bar5, Bar6, Bar7, Bar8, Bar9];
         vm.PropertyChanged += OnVmPropertyChanged;
         SystemEvents.DisplaySettingsChanged += (_, _) => Dispatcher.Invoke(PositionBottomCenter);
 
@@ -77,7 +78,7 @@ public partial class DynamicIslandWindow : Window
                 RecordingContent.Visibility    = Visibility.Collapsed;
                 TranscribingContent.Visibility = Visibility.Collapsed;
                 ErrorContent.Visibility        = Visibility.Visible;
-                ShowCapsule(220);
+                ShowCapsule(200);
                 _waveformTimer.Stop();
                 _spinnerAnim.Stop(this);
                 ScheduleErrorDismiss();
@@ -109,14 +110,14 @@ public partial class DynamicIslandWindow : Window
 
     private void ScheduleErrorDismiss()
     {
-        var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
-        timer.Tick += (_, _) =>
+        _errorDismissTimer?.Stop();
+        _errorDismissTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
+        _errorDismissTimer.Tick += (_, _) =>
         {
-            timer.Stop();
-            if (_vm.State == RecordingState.Error)
-                HideCapsule();
+            _errorDismissTimer!.Stop();
+            if (_vm.State == RecordingState.Error) HideCapsule();
         };
-        timer.Start();
+        _errorDismissTimer.Start();
     }
 
     private void OnWaveformTick(object? sender, EventArgs e)
