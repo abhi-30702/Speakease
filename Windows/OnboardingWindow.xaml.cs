@@ -10,6 +10,7 @@ public partial class OnboardingWindow : Window
     private readonly SettingsService _settingsService;
     private int _step = 1;
     private bool _modelReady;
+    private bool _downloadInProgress;
 
     // 560 px window width: 25 / 50 / 75 / 100 %
     private static readonly double[] ProgressWidths = [140, 280, 420, 560];
@@ -52,7 +53,8 @@ public partial class OnboardingWindow : Window
         if (_step == 1)
         {
             ShowStep(2);
-            await StartModelDownloadAsync();
+            if (!_downloadInProgress)
+                await StartModelDownloadAsync();
             return;
         }
         ShowStep(_step + 1);
@@ -65,16 +67,18 @@ public partial class OnboardingWindow : Window
 
     private async Task StartModelDownloadAsync()
     {
+        _downloadInProgress          = true;
         DownloadProgress.Visibility  = Visibility.Visible;
         DownloadErrorPanel.Visibility = Visibility.Collapsed;
         NextButton.IsEnabled         = false;
 
-        var progress = new Progress<string>(msg =>
-            Dispatcher.Invoke(() => DownloadStatus.Text = msg));
+        // Progress<T> captures the UI sync context — no Dispatcher.Invoke needed
+        var progress = new Progress<string>(msg => DownloadStatus.Text = msg);
 
         try
         {
             await _transcription.InitializeAsync(progress);
+            if (!IsLoaded) return;
             DownloadProgress.Visibility = Visibility.Collapsed;
             DownloadStatus.Text         = "Model ready ✓";
             _modelReady                 = true;
@@ -82,9 +86,14 @@ public partial class OnboardingWindow : Window
         }
         catch (Exception ex)
         {
+            if (!IsLoaded) return;
             DownloadProgress.Visibility  = Visibility.Collapsed;
             DownloadErrorText.Text       = ex.Message;
             DownloadErrorPanel.Visibility = Visibility.Visible;
+        }
+        finally
+        {
+            _downloadInProgress = false;
         }
     }
 
