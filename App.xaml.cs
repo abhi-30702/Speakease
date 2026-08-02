@@ -18,7 +18,7 @@ public partial class App : System.Windows.Application
     private IntPtr _hookHandle = IntPtr.Zero;
     private NativeMethods.LowLevelKeyboardProc? _hookProc;
     private DictationEngine? _engine;
-    private PillWindow? _pillWindow;
+    private DynamicIslandWindow? _pillWindow;
     private Windows.MainWindow? _mainWindow;
     private MainViewModel? _mainVm;
     private InsightsViewModel? _insightsVm;
@@ -49,7 +49,20 @@ public partial class App : System.Windows.Application
         var cleanup    = new TieredCleanupService(groq, regex);
         var insertion  = new InsertionService(focus);
 
-        // Tray + model load
+        // First-run onboarding (ShowDialog blocks until window closes)
+        if (!settingsService.Current.HasCompletedOnboarding)
+        {
+            var onboarding = new OnboardingWindow(transcription, settingsService);
+            onboarding.ShowDialog();
+            if (!settingsService.Current.HasCompletedOnboarding)
+            {
+                // User closed before finishing — exit without starting the app
+                Shutdown();
+                return;
+            }
+        }
+
+        // Tray + model load (InitializeAsync is a no-op when model is already loaded from onboarding)
         SetupTray();
         _trayIcon!.ShowBalloonTip(3000, "Whisper Flow", "Loading speech model...", ToolTipIcon.Info);
         await transcription.InitializeAsync();
@@ -58,10 +71,11 @@ public partial class App : System.Windows.Application
         // Engine
         _engine = new DictationEngine(audio, transcription, cleanup, insertion, focus, _insights);
 
-        // Pill
-        var pillVm = new PillViewModel();
+        // Dynamic Island pill (transparent at idle — capsule is Collapsed)
+        var pillVm = new DynamicIslandViewModel();
         pillVm.SyncFrom(_engine);
-        _pillWindow = new PillWindow(pillVm);
+        _pillWindow = new DynamicIslandWindow(pillVm);
+        _pillWindow.Show();
 
         // ViewModels
         _insightsVm = new InsightsViewModel(_insights);
