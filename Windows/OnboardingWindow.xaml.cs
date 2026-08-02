@@ -99,6 +99,7 @@ public partial class OnboardingWindow : Window
 
     private async void OnRetryClick(object sender, RoutedEventArgs e)
     {
+        if (_downloadInProgress) return;
         DownloadErrorPanel.Visibility = Visibility.Collapsed;
         await StartModelDownloadAsync();
     }
