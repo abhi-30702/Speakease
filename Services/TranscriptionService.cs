@@ -74,7 +74,8 @@ public class TranscriptionService : IAsyncDisposable
 
     private static async Task<string> ComputeSha256Async(string path)
     {
-        await using var fs = File.OpenRead(path);
+        // FileShare.ReadWrite so we can hash the file even while Defender is scanning it
+        await using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         var bytes = await SHA256.HashDataAsync(fs);
         return Convert.ToHexString(bytes).ToLowerInvariant();
     }
@@ -89,9 +90,12 @@ public class TranscriptionService : IAsyncDisposable
         try
         {
             using var modelStream = await WhisperGgmlDownloader.GetGgmlModelAsync(GgmlType.SmallEn);
-            // FileShare.Read lets AV scanners read while we write, avoiding the lock error
-            await using var fs = new FileStream(tmpPath, FileMode.Create, FileAccess.Write, FileShare.Read);
-            await modelStream.CopyToAsync(fs);
+            {
+                // FileShare.Read lets AV scanners read while we write.
+                // Inner scope closes our handle before File.Move — Defender can't block rename if we hold no handle.
+                await using var fs = new FileStream(tmpPath, FileMode.Create, FileAccess.Write, FileShare.Read);
+                await modelStream.CopyToAsync(fs);
+            }
             File.Move(tmpPath, destPath, overwrite: true);
         }
         catch
